@@ -1,8 +1,8 @@
 
-from app.data.database import init_db
+from app.database import init_db
 from sqlalchemy.orm import Session
 from app.models.models import Player, Character, Origin, Rule, Stat, CharacterStat, Skill, CharacterSkill, Attribute, CharacterSkillAttribute
-from app.utils.utils import get_db
+from app.utils import get_db
 
 def main():
     init_db()
