@@ -1,7 +1,9 @@
 
+from database import Base
 from sqlalchemy import Column, Integer, String, ForeignKey, Text, JSON
 from sqlalchemy.orm import relationship
-from app.database import Base
+from werkzeug.security import generate_password_hash, check_password_hash
+
 
 class Player(Base):
     __tablename__ = "player"
