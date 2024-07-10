@@ -1,7 +1,7 @@
 
 from flask import render_template, url_for, flash, redirect
 from app import app, db
-from app.forms import RegistrationForm, LoginForm
+from app.forms import RegistrationForm, LoginForm, BackgroundForm
 from app.models import User, Character
 from flask_login import login_user, current_user, logout_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -12,7 +12,6 @@ def index():
     if current_user.is_authenticated:
         return redirect(url_for("dashboard"))
     return render_template("index.html")
-
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -29,7 +28,6 @@ def register():
         return redirect(url_for("login"))
     return render_template("register.html", title="Register", form=form)
 
-
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
@@ -45,15 +43,33 @@ def login():
             flash("Login unsuccessful. Please check username and password", "danger")
     return render_template("login.html", title="Login", form=form)
 
-
 @app.route("/logout")
 def logout():
     logout_user()
     return redirect(url_for("index"))
-
 
 @app.route("/dashboard")
 @login_required
 def dashboard():
     characters = Character.query.filter_by(user_id=current_user.id).all()
     return render_template("dashboard.html", characters=characters)
+
+@app.route("/create_character", methods=["GET", "POST"])
+@login_required
+def create_character():
+    form = BackgroundForm()
+
+    if form.validate_on_submit():
+        new_character = Character(
+            name=form.name.data,
+            origin_id=form.origin_id.data,
+            user_id=current_user.id
+        )
+
+        db.session.add(new_character)
+        db.session.commit()
+
+        return redirect(url_for("choose_specials", character_id=new_character.id))
+    
+    return render_template("create_character.html", form=form)
+

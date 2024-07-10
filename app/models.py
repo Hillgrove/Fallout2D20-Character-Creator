@@ -15,7 +15,7 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String, nullable=False)
 
     # Relationship with characters
-    characters = db.relationship('Character', backref='owner', lazy=True)
+    characters = db.relationship('Character', back_populates='user', lazy=True)
 
 class Character(db.Model):
     __tablename__ = "character"
@@ -26,8 +26,8 @@ class Character(db.Model):
     origin_id = db.Column(db.Integer, db.ForeignKey("origin.id"), nullable=False)
 
     # Relationships to User and Origin
-    user = db.relationship("User", backref='character_entries')
-    origin = db.relationship("Origin", backref='character_entries')
+    user = db.relationship("User", back_populates='characters')
+    origin = db.relationship("Origin", back_populates='characters')
 
 class Stat(db.Model):
     __tablename__ = "stat"
@@ -85,8 +85,9 @@ class Origin(db.Model):
     description = db.Column(db.Text, nullable=False)
     rule_id = db.Column(db.Integer, db.ForeignKey("rule.id"), nullable=False)
 
-    # Relationship to Rule
-    rule = db.relationship("Rule")
+    # Relationship to Rulem Character
+    rule = db.relationship("Rule", back_populates='origins')
+    characters = db.relationship("Character", back_populates='origin')
 
 class Rule(db.Model):
     __tablename__ = "rule"
@@ -94,3 +95,6 @@ class Rule(db.Model):
     name = db.Column(db.String, nullable=False, unique=True)
     description = db.Column(db.Text, nullable=False)
     rule_data = db.Column(db.JSON, nullable=False)
+
+    # Relationship to Origins
+    origins = db.relationship("Origin", back_populates='rule')
