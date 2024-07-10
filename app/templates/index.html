@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="jumbotron mt-4">
+    <h1>Welcome to the Fallout 2D20 Character Manager</h1>
+    <p class="lead">Manage your characters for the Fallout 2D20 TTRPG.</p>
+    <a class="btn btn-primary btn-lg" href="{{ url_for('register') }}" role="button">Get Started</a>
+</div>
+{% endblock %}

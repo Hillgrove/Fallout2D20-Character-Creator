@@ -8,7 +8,7 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="{{ url_for('home') }}">TTRPG App</a>
+        <a class="navbar-brand" href="{{ url_for('index') }}">TTRPG App</a>
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav ml-auto">
                 {% if current_user.is_authenticated %}
@@ -26,6 +26,7 @@
             </ul>
         </div>
     </nav>
+
     <div class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -36,7 +37,9 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
-        {% block content %}{% endblock %}
+
+        {% block content %}
+        {% endblock %}
     </div>
 </body>
 </html>
