@@ -1,8 +1,8 @@
 
-from flask import render_template, url_for, flash, redirect
+from flask import render_template, url_for, flash, redirect, request
 from app import app, db
-from app.forms import RegistrationForm, LoginForm, BackgroundForm
-from app.models import User, Character
+from app.forms import RegistrationForm, LoginForm, BackgroundForm, SpecialForm
+from app.models import User, Character, Stat, CharacterStat
 from flask_login import login_user, current_user, logout_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -73,3 +73,25 @@ def create_character():
     
     return render_template("create_character.html", form=form)
 
+@app.route("/choose_specials/<int:character_id>", methods=["GET", "POST"])
+@login_required
+def choose_specials(character_id):
+    character = Character.query.get_or_404(character_id)
+    form = SpecialForm()
+
+    if form.validate_on_submit():
+        # Loop through each stat and save the selected value
+        for stat in Stat.query.all():
+            stat_value = request.form.get(f"stat_{stat.id}")
+            character_stat = CharacterStat(
+                character_id = character.id,
+                stat = stat.id, 
+                value = stat_value
+            )
+            db.session.add(character_stat)
+
+            db.session.commit()
+
+        return redirect(url_for("choose_perks", character_id=character.id))
+    
+    return render_template("choose_specials.html", form=form, character=character, stats=Stat.query.all())

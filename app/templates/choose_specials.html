@@ -1,0 +1,20 @@
+<!-- choose_specials.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Choose S.P.E.C.I.A.L. Stats for {{ character.name }}</h1>
+    <form method="POST" action="{{ url_for('choose_specials', character_id=character.id) }}">
+        {{ form.hidden_tag() }}
+        {% for stat in stats %}
+        <div class="form-group">
+            <label for="stat_{{ stat.id }}">{{ stat.name }}</label>
+            <input type="number" class="form-control" id="stat_{{ stat.id }}" name="stat_{{ stat.id }}" min="1" max="10" required>
+        </div>
+        {% endfor %}
+        <div class="form-group">
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+</div>
+{% endblock %}

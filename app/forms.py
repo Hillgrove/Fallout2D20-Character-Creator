@@ -1,7 +1,7 @@
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField
-from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, IntegerField
+from wtforms.validators import DataRequired, Length, EqualTo, ValidationError, NumberRange
 from app.models import User, Origin
 
 class RegistrationForm(FlaskForm):
@@ -30,3 +30,14 @@ class BackgroundForm(FlaskForm):
         super(BackgroundForm, self).__init__(*args, **kwargs)
         # Populate origin choices from the database
         self.origin_id.choices = [(origin.id, Origin.name) for origin in Origin.query.all()]
+
+class SpecialForm(FlaskForm):
+    # Integer fields for each S.P.E.C.I.A.L. stat
+    strength = IntegerField('Strength', validators=[DataRequired(), NumberRange(min=1, max=10)])
+    perception = IntegerField('Perception', validators=[DataRequired(), NumberRange(min=1, max=10)])
+    endurance = IntegerField('Endurance', validators=[DataRequired(), NumberRange(min=1, max=10)])
+    charisma = IntegerField('Charisma', validators=[DataRequired(), NumberRange(min=1, max=10)])
+    intelligence = IntegerField('Intelligence', validators=[DataRequired(), NumberRange(min=1, max=10)])
+    agility = IntegerField('Agility', validators=[DataRequired(), NumberRange(min=1, max=10)])
+    luck = IntegerField('Luck', validators=[DataRequired(), NumberRange(min=1, max=10)])
+    submit = SubmitField("Next")
