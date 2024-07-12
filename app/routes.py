@@ -73,28 +73,61 @@ def create_character():
     
     return render_template("create_character.html", form=form)
 
+
 @app.route("/choose_specials/<int:character_id>", methods=["GET", "POST"])
 @login_required
 def choose_specials(character_id):
     character = Character.query.get_or_404(character_id)
     form = SpecialForm()
 
-    if form.validate_on_submit():
-        # Loop through each stat and save the selected value
-        for stat in Stat.query.all():
-            stat_value = request.form.get(f"stat_{stat.id}")
-            character_stat = CharacterStat(
-                character_id = character.id,
-                stat_id = stat.id, 
-                value = stat_value
-            )
-            db.session.add(character_stat)
+    if request.method == "POST":
+        app.logger.info("POST request received")
+        if form.validate_on_submit():
+            app.logger.info("Form validated successfully")
+            try:
+                # Remove existing CharacterStat entries for the character to avoid duplicates
+                CharacterStat.query.filter_by(character_id=character.id).delete()
 
-        db.session.commit()
+                # Create a list of the form data to handle each stat
+                stats = {
+                    "Strength": form.strength.data,
+                    "Perception": form.perception.data,
+                    "Endurance": form.endurance.data,
+                    "Charisma": form.charisma.data,
+                    "Intelligence": form.intelligence.data,
+                    "Agility": form.agility.data,
+                    "Luck": form.luck.data
+                }
 
-        return redirect(url_for("choose_perks", character_id=character.id))
-    
+                # Loop through each stat and save the selected value
+                for stat_name, stat_value in stats.items():
+                    stat = Stat.query.filter_by(name=stat_name).first()
+                    if stat:
+                        character_stat = CharacterStat(
+                            character_id=character.id,
+                            stat_id=stat.id,
+                            value=stat_value
+                        )
+                        db.session.add(character_stat)
+
+                db.session.commit()
+                return redirect(url_for("choose_perks", character_id=character.id))
+            except Exception as e:
+                db.session.rollback()
+                app.logger.error(f"Error saving stats: {e}")
+                flash("An error occurred while saving your stats. Please try again.", "danger")
+        else:
+            app.logger.warning("Form validation failed")
+            for field, errors in form.errors.items():
+                for error in errors:
+                    app.logger.warning(f"Validation error in {field}: {error}")
+            flash("Please correct the errors in the form and resubmit.", "danger")
+
     return render_template("choose_specials.html", form=form, character=character, stats=Stat.query.all())
+
+
+
+
 
 @app.route("/choose_perks/<int:character_id>", methods=["GET", "POST"])
 @login_required
