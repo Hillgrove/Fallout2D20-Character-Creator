@@ -1,9 +1,9 @@
 
-from flask import render_template, url_for, flash, redirect, request
-from app import app, db
-from app.forms import RegistrationForm, LoginForm, BackgroundForm, SpecialForm
-from app.models import User, Character, Stat, CharacterStat
+from flask import render_template, redirect, request, url_for, flash
 from flask_login import login_user, current_user, logout_user, login_required
+from app import app, db
+from app.forms import RegistrationForm, LoginForm, BackgroundForm, SpecialForm, PerkForm
+from app.models import User, Character, Stat, CharacterStat, Perk, CharacterPerk
 from werkzeug.security import generate_password_hash, check_password_hash
 
 @app.route("/")
@@ -85,13 +85,34 @@ def choose_specials(character_id):
             stat_value = request.form.get(f"stat_{stat.id}")
             character_stat = CharacterStat(
                 character_id = character.id,
-                stat = stat.id, 
+                stat_id = stat.id, 
                 value = stat_value
             )
             db.session.add(character_stat)
 
-            db.session.commit()
+        db.session.commit()
 
         return redirect(url_for("choose_perks", character_id=character.id))
     
     return render_template("choose_specials.html", form=form, character=character, stats=Stat.query.all())
+
+@app.route("/choose_perks/<int:character_id>", methods=["GET", "POST"])
+@login_required
+def choose_perks(character_id):
+    character = Character.query.get_or_404(character_id)
+    form = PerkForm()
+
+    if form.validate_on_submit():
+        selected_perks = request.form.getlist("perks")
+        for perk_id in selected_perks:
+            character_perk = CharacterPerk(
+                character_id=character.id,
+                perk_id=perk_id
+            )
+            db.session.add(character_perk)
+
+        db.session.commit()
+
+        return redirect(url_for("choose_skills", character_id=character.id))
+    
+    return render_template("choose_perks.html", form=form, character=character, perks=Perk.query.all())

@@ -1,8 +1,8 @@
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, IntegerField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, IntegerField, SelectMultipleField
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError, NumberRange
-from app.models import User, Origin
+from app.models import User, Origin, Perk
 
 class RegistrationForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired(), Length(min=2, max=20)])
@@ -29,7 +29,7 @@ class BackgroundForm(FlaskForm):
     def __init__(self, *args, **kwargs):
         super(BackgroundForm, self).__init__(*args, **kwargs)
         # Populate origin choices from the database
-        self.origin_id.choices = [(origin.id, Origin.name) for origin in Origin.query.all()]
+        self.origin_id.choices = [(origin.id, origin.name) for origin in Origin.query.all()]
 
 class SpecialForm(FlaskForm):
     # Integer fields for each S.P.E.C.I.A.L. stat
@@ -41,3 +41,11 @@ class SpecialForm(FlaskForm):
     agility = IntegerField('Agility', validators=[DataRequired(), NumberRange(min=1, max=10)])
     luck = IntegerField('Luck', validators=[DataRequired(), NumberRange(min=1, max=10)])
     submit = SubmitField("Next")
+
+class PerkForm(FlaskForm):
+    perks = SelectMultipleField("Perks", coerce=int, validators=[DataRequired()])
+    submit = SubmitField("Next")
+
+    def __init__(self, *args, **kwargs):
+        super(PerkForm, self).__init__(*args, **kwargs)
+        self.perks.choices = [(perk.id, perk.name) for perk in Perk.query.all()]
