@@ -2,7 +2,7 @@
 from flask import render_template, redirect, request, url_for, flash
 from flask_login import login_user, current_user, logout_user, login_required
 from app import app, db
-from app.forms import RegistrationForm, LoginForm, BackgroundForm, SpecialForm, PerkForm
+from app.forms import RegistrationForm, LoginForm, BackgroundForm, SpecialForm, PerkForm, DeleteForm
 from app.models import User, Character, Stat, CharacterStat, Perk, CharacterPerk
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -52,7 +52,8 @@ def logout():
 @login_required
 def dashboard():
     characters = Character.query.filter_by(user_id=current_user.id).all()
-    return render_template("dashboard.html", characters=characters)
+    delete_form = DeleteForm()
+    return render_template("dashboard.html", characters=characters, form=delete_form)
 
 @app.route("/create_character", methods=["GET", "POST"])
 @login_required
@@ -125,10 +126,6 @@ def choose_specials(character_id):
 
     return render_template("choose_specials.html", form=form, character=character, stats=Stat.query.all())
 
-
-
-
-
 @app.route("/choose_perks/<int:character_id>", methods=["GET", "POST"])
 @login_required
 def choose_perks(character_id):
@@ -149,3 +146,26 @@ def choose_perks(character_id):
         return redirect(url_for("choose_skills", character_id=character.id))
     
     return render_template("choose_perks.html", form=form, character=character, perks=Perk.query.all())
+
+@app.route("/delete_character/<int:character_id>", methods=["POST"])
+@login_required
+def delete_character(character_id):
+    character = Character.query.get_or_404(character_id)
+    db.session.delete(character)
+    db.session.commit()
+    flash("Character successfully deleted", "success")
+    return redirect(url_for("dashboard"))
+
+# @app.route("/edit_character/<int:character_id>", methods=["POST"])
+# @login_required
+# def edit_character(character_id):
+#     character = Character.query.get_or_404(character_id)
+#     form = CharacterForm(obj=character)
+
+#     if form.validate_on_submit():
+#         form.populate_obj(character)
+#         db.session.commit()
+#         flash("Character updated successfully", "success")
+#         return redirect(url_for("dashboard"))
+    
+#     return render_template("edit_character.html", form=form, character=character)

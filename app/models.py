@@ -26,12 +26,12 @@ class Character(db.Model):
     # Relationships to User and Origin
     user = db.relationship("User", back_populates='characters')
     origin = db.relationship("Origin", back_populates='characters')
-    
-    # Relationships to Stats, Skills, Attributes, and Perks
-    character_stats = db.relationship("CharacterStat", back_populates='character')
-    character_skills = db.relationship("CharacterSkill", back_populates='character')
-    character_skill_attributes = db.relationship("CharacterSkillAttribute", back_populates='character')
-    character_perks = db.relationship("CharacterPerk", back_populates='character')
+
+    # Relationships to Stats, Skills, Attributes, and Perks with cascading deletes
+    character_stats = db.relationship("CharacterStat", back_populates='character', cascade='all, delete-orphan')
+    character_skills = db.relationship("CharacterSkill", back_populates='character', cascade='all, delete-orphan')
+    character_skill_attributes = db.relationship("CharacterSkillAttribute", back_populates='character', cascade='all, delete-orphan')
+    character_perks = db.relationship("CharacterPerk", back_populates='character', cascade='all, delete-orphan')
 
 class Stat(db.Model):
     __tablename__ = "stat"
