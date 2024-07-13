@@ -52,3 +52,7 @@ class PerkForm(FlaskForm):
 
 class DeleteForm(FlaskForm):
     pass
+
+class SkillForm(FlaskForm):
+    skills = SelectMultipleField("Skills", coerce=int, validators=[DataRequired()])
+    submit = SubmitField("Next")

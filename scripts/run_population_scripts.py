@@ -9,7 +9,8 @@ scripts_folder = os.path.dirname(__file__)
 scripts = [
     "populate_origins.py",
     "populate_specials.py",
-    "populate_perks.py"
+    "populate_perks.py",
+    "populate_skills.py"
 ]
 
 def run_script(script_folder, script_name):

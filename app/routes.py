@@ -2,8 +2,8 @@
 from flask import render_template, redirect, request, url_for, flash
 from flask_login import login_user, current_user, logout_user, login_required
 from app import app, db
-from app.forms import RegistrationForm, LoginForm, BackgroundForm, SpecialForm, PerkForm, DeleteForm
-from app.models import User, Character, Stat, CharacterStat, Perk, CharacterPerk
+from app.forms import RegistrationForm, LoginForm, BackgroundForm, SpecialForm, PerkForm, DeleteForm, SkillForm
+from app.models import User, Character, Stat, CharacterStat, Perk, CharacterPerk, Skill, CharacterSkill
 from werkzeug.security import generate_password_hash, check_password_hash
 
 @app.route("/")
@@ -54,6 +54,29 @@ def dashboard():
     characters = Character.query.filter_by(user_id=current_user.id).all()
     delete_form = DeleteForm()
     return render_template("dashboard.html", characters=characters, form=delete_form)
+
+@app.route("/delete_character/<int:character_id>", methods=["POST"])
+@login_required
+def delete_character(character_id):
+    character = Character.query.get_or_404(character_id)
+    db.session.delete(character)
+    db.session.commit()
+    flash("Character successfully deleted", "success")
+    return redirect(url_for("dashboard"))
+
+# @app.route("/edit_character/<int:character_id>", methods=["POST"])
+# @login_required
+# def edit_character(character_id):
+#     character = Character.query.get_or_404(character_id)
+#     form = CharacterForm(obj=character)
+
+#     if form.validate_on_submit():
+#         form.populate_obj(character)
+#         db.session.commit()
+#         flash("Character updated successfully", "success")
+#         return redirect(url_for("dashboard"))
+    
+#     return render_template("edit_character.html", form=form, character=character)
 
 @app.route("/create_character", methods=["GET", "POST"])
 @login_required
@@ -147,25 +170,27 @@ def choose_perks(character_id):
     
     return render_template("choose_perks.html", form=form, character=character, perks=Perk.query.all())
 
-@app.route("/delete_character/<int:character_id>", methods=["POST"])
+@app.route("/choose_skills/<int:character_id>", methods=["GET", "POST"])
 @login_required
-def delete_character(character_id):
+def choose_skills(character_id):
     character = Character.query.get_or_404(character_id)
-    db.session.delete(character)
-    db.session.commit()
-    flash("Character successfully deleted", "success")
-    return redirect(url_for("dashboard"))
-
-# @app.route("/edit_character/<int:character_id>", methods=["POST"])
-# @login_required
-# def edit_character(character_id):
-#     character = Character.query.get_or_404(character_id)
-#     form = CharacterForm(obj=character)
-
-#     if form.validate_on_submit():
-#         form.populate_obj(character)
-#         db.session.commit()
-#         flash("Character updated successfully", "success")
-#         return redirect(url_for("dashboard"))
+    form = SkillForm()
     
-#     return render_template("edit_character.html", form=form, character=character)
+    # Populate the skill choices
+    form.skills.choices = [(skill.id, skill.name) for skill in Skill.query.all()]
+
+    if form.validate_on_submit():
+        # Clear existing CharacterSkill entries to avoid duplicates
+        CharacterSkill.query.filter_by(character_id=character.id).delete()
+
+        # Add selected skills to the character
+        for skill_id in form.skills.data:
+            character_skill = CharacterSkill(character_id=character.id, skill_id=skill_id)
+            db.session.add(character_skill)
+
+        db.session.commit()
+
+        flash("Skills successfully selected", "success")
+        return redirect(url_for("character_overview", character_id=character.id))
+
+    return render_template("choose_skills.html", form=form, character=character)
