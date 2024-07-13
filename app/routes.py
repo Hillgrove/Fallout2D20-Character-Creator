@@ -194,3 +194,16 @@ def choose_skills(character_id):
         return redirect(url_for("character_overview", character_id=character.id))
 
     return render_template("choose_skills.html", form=form, character=character)
+
+@app.route("/character_overview/<int:character_id>")
+@login_required
+def character_overview(character_id):
+    # Fetch the character from the database
+    character = Character.query.get_or_404(character_id)
+
+    # Fetch related stats, skills, and perks
+    character_stats = CharacterStat.query.filter_by(character_id=character.id).all()
+    character_skills = CharacterSkill.query.filter_by(character_id=character.id).all()
+    character_perks = CharacterPerk.query.filter_by(character_id=character.id).all()
+
+    return render_template("character_overview.html", character=character, character_stats=character_stats, character_skills=character_skills, character_perks=character_perks)

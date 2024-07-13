@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Character Overview: {{ character.name }}</h1>
+    
+    <h2>Basic Info</h2>
+    <p><strong>Name:</strong> {{ character.name }}</p>
+    <p><strong>Origin:</strong> {{ character.origin.name }}</p>
+    <p><strong>Current XP:</strong> {{ character.current_xp }}</p>
+    
+    <h2>S.P.E.C.I.A.L Stats</h2>
+    <ul>
+        {% for stat in character_stats %}
+        <li><strong>{{ stat.stat.name }}:</strong> {{ stat.value }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Skills</h2>
+    <ul>
+        {% for skill in character_skills %}
+        <li><strong>{{ skill.skill.name }}:</strong> {{ skill.value }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Perks</h2>
+    <ul>
+        {% for perk in character_perks %}
+        <li><strong>{{ perk.perk.name }}:</strong> {{ perk.perk.description }}</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Back to Dashboard</a>
+</div>
+{% endblock %}
