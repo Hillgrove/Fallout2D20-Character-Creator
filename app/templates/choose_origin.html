@@ -1,10 +1,9 @@
-
 {% extends "base.html" %}
 
 {% block content %}
 <div class="container">
     <h1>Create Character</h1>
-    <form method="POST" action="{{ url_for('choose_origin') }}">
+    <form method="POST" action="{{ url_for('choose_origin') }}" onsubmit="return validateForm()">
         {{ form.hidden_tag() }}
         <div class="form-group">
             {{ form.name.label(class="form-control-label") }}
@@ -14,29 +13,73 @@
             {{ form.origin_id.label(class="form-control-label") }}
             {{ form.origin_id(class="form-control", id="origin_id") }}
         </div>
-        <div class="form-group">
+        <div class="form-group" id="description-container" style="display: none;">
             <label for="origin_description" class="form-control-label">Background Description</label>
             <p id="origin_description" class="form-control-static"></p>
         </div>
+        <div class="form-group" id="stat-ranges-container" style="display: none;">
+            <label for="stat_ranges" class="form-control-label">Stat Ranges</label>
+            <ul id="stat_ranges" class="form-control-static"></ul>
+        </div>
         <div class="form-group">
-            {{ form.submit(class="btn btn-primary") }}
+            {{ form.submit(class="btn btn-primary", disabled=True) }}
         </div>
     </form>
 </div>
 
 <script>
-// JavaScript to dynamically update the background description
+// Function to validate form before submission
+function validateForm() {
+    var originId = document.getElementById('origin_id').value;
+    if (originId == -1) {
+        alert('Please select a valid origin.');
+        return false;
+    }
+    return true;
+}
+
+// JavaScript to dynamically update the background description and stat ranges
 document.getElementById('origin_id').addEventListener('change', function() {
-    // Get the selected background ID
     var originId = this.value;
-    
-    // Make an AJAX request to fetch the description
-    fetch('{{ url_for("get_origin_description") }}?origin_id=' + originId)
-        .then(response => response.json())
-        .then(data => {
-            // Update the description paragraph
-            document.getElementById('origin_description').innerText = data.description;
-        });
+    var submitButton = document.querySelector('input[type="submit"]');
+
+    if (originId == -1) {
+        // Hide description and stat ranges, disable submit button
+        document.getElementById('description-container').style.display = 'none';
+        document.getElementById('stat-ranges-container').style.display = 'none';
+        submitButton.disabled = true;
+    } else {
+        // Make an AJAX request to fetch the description and stat ranges
+        fetch('{{ url_for("get_origin_description") }}?origin_id=' + originId)
+            .then(response => response.json())
+            .then(data => {
+                // Show and update the description paragraph
+                document.getElementById('description-container').style.display = 'block';
+                document.getElementById('origin_description').innerText = data.description;
+
+                // Show and update the stat ranges
+                document.getElementById('stat-ranges-container').style.display = 'block';
+                var statRanges = document.getElementById('stat_ranges');
+                statRanges.innerHTML = '';
+                for (var stat in data.stat_ranges) {
+                    var range = data.stat_ranges[stat];
+                    var li = document.createElement('li');
+                    li.textContent = `${stat}: Min ${range.min}, Max ${range.max}`;
+                    statRanges.appendChild(li);
+                }
+
+                // Enable the submit button
+                submitButton.disabled = false;
+            });
+    }
+});
+
+// Prevent selecting the default value after changing away from it
+document.getElementById('origin_id').addEventListener('focus', function() {
+    var defaultOption = this.querySelector('option[value="-1"]');
+    if (defaultOption) {
+        defaultOption.disabled = true;
+    }
 });
 </script>
 {% endblock %}

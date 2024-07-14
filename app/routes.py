@@ -114,63 +114,29 @@ def get_origin_description():
     # Get the origin_id from the request arguments
     origin_id = request.args.get('origin_id', type=int)
     
-    # Query the database for the origin description
+    # Query the database for the origin description and traits
     origin = Origin.query.get(origin_id)
     
-    # Return the description as JSON
-    return jsonify(description=origin.description)
+    # Build the stat_ranges dictionary
+    stat_ranges = {}
+    for trait in origin.traits:
+        if "stat" in trait.trait_data:
+            stat_ranges[trait.trait_data["stat"]] = {
+                "min": 1,
+                "max": trait.trait_data["max"]
+            }
 
+    # Ensure all stats have default max value if not overridden by traits
+    stats = ["Strength", "Perception", "Endurance", "Charisma", "Intelligence", "Agility", "Luck"]
+    for stat in stats:
+        if stat not in stat_ranges:
+            stat_ranges[stat] = {
+                "min": 1,
+                "max": 10
+            }
 
-# @app.route("/choose_specials/<int:character_id>", methods=["GET", "POST"])
-# @login_required
-# def choose_specials(character_id):
-#     character = Character.query.get_or_404(character_id)
-#     form = StatForm()
-
-#     if request.method == "POST":
-#         app.logger.info("POST request received")
-#         if form.validate_on_submit():
-#             app.logger.info("Form validated successfully")
-#             try:
-#                 # Remove existing CharacterStat entries for the character to avoid duplicates
-#                 CharacterStat.query.filter_by(character_id=character.id).delete()
-
-#                 # Create a list of the form data to handle each stat
-#                 stats = {
-#                     "Strength": form.strength.data,
-#                     "Perception": form.perception.data,
-#                     "Endurance": form.endurance.data,
-#                     "Charisma": form.charisma.data,
-#                     "Intelligence": form.intelligence.data,
-#                     "Agility": form.agility.data,
-#                     "Luck": form.luck.data
-#                 }
-
-#                 # Loop through each stat and save the selected value
-#                 for stat_name, stat_value in stats.items():
-#                     stat = Stat.query.filter_by(name=stat_name).first()
-#                     if stat:
-#                         character_stat = CharacterStat(
-#                             character_id=character.id,
-#                             stat_id=stat.id,
-#                             value=stat_value
-#                         )
-#                         db.session.add(character_stat)
-
-#                 db.session.commit()
-#                 return redirect(url_for("choose_perks", character_id=character.id))
-#             except Exception as e:
-#                 db.session.rollback()
-#                 app.logger.error(f"Error saving stats: {e}")
-#                 flash("An error occurred while saving your stats. Please try again.", "danger")
-#         else:
-#             app.logger.warning("Form validation failed")
-#             for field, errors in form.errors.items():
-#                 for error in errors:
-#                     app.logger.warning(f"Validation error in {field}: {error}")
-#             flash("Please correct the errors in the form and resubmit.", "danger")
-
-#     return render_template("choose_specials.html", form=form, character=character, stats=Stat.query.all())
+    # Return the description and stat ranges as JSON
+    return jsonify(description=origin.description, stat_ranges=stat_ranges)
 
 
 @app.route("/choose_specials/<int:character_id>", methods=["GET", "POST"])

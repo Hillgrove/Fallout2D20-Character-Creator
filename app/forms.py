@@ -29,8 +29,8 @@ class BackgroundForm(FlaskForm):
 
     def __init__(self, *args, **kwargs):
         super(BackgroundForm, self).__init__(*args, **kwargs)
-        # Populate origin choices from the database
-        self.origin_id.choices = [(origin.id, origin.name) for origin in Origin.query.all()]
+        # Populate origin choices from the database with a default option
+        self.origin_id.choices = [(-1, 'Select an Origin')] + [(origin.id, origin.name) for origin in Origin.query.all()]
 
 class StatForm(FlaskForm):
     strength = IntegerField('Strength', validators=[DataRequired(), NumberRange(min=1, max=10)])
