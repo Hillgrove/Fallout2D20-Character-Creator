@@ -6,6 +6,13 @@ from flask_login import UserMixin
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+
+character_selectable_traits = db.Table('character_selectable_traits',
+    db.Column('character_id', db.Integer, db.ForeignKey('character.id'), primary_key=True),
+    db.Column('trait_id', db.Integer, db.ForeignKey('trait.id'), primary_key=True)
+)
+
+
 class User(db.Model, UserMixin):
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -14,6 +21,7 @@ class User(db.Model, UserMixin):
 
     # Relationship with characters
     characters = db.relationship('Character', back_populates='user', lazy=True)
+
 
 class Character(db.Model):
     __tablename__ = "character"
@@ -32,6 +40,8 @@ class Character(db.Model):
     character_skills = db.relationship("CharacterSkill", back_populates='character', cascade='all, delete-orphan')
     character_skill_attributes = db.relationship("CharacterSkillAttribute", back_populates='character', cascade='all, delete-orphan')
     character_perks = db.relationship("CharacterPerk", back_populates='character', cascade='all, delete-orphan')
+    selectable_traits = db.relationship("Trait", secondary=character_selectable_traits, backref='characters')
+
 
 class Stat(db.Model):
     __tablename__ = "stat"
@@ -41,6 +51,7 @@ class Stat(db.Model):
     
     # Relationship to CharacterStat
     character_stats = db.relationship("CharacterStat", back_populates='stat')
+
 
 class CharacterStat(db.Model):
     __tablename__ = "character_stat"
@@ -52,6 +63,7 @@ class CharacterStat(db.Model):
     character = db.relationship("Character", back_populates='character_stats')
     stat = db.relationship("Stat", back_populates='character_stats')
 
+
 class Skill(db.Model):
     __tablename__ = "skill"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -61,6 +73,7 @@ class Skill(db.Model):
     # Relationship to CharacterSkill
     character_skills = db.relationship("CharacterSkill", back_populates='skill')
     character_skill_attributes = db.relationship("CharacterSkillAttribute", back_populates='skill')
+
 
 class CharacterSkill(db.Model):
     __tablename__ = "character_skill"
@@ -72,6 +85,7 @@ class CharacterSkill(db.Model):
     character = db.relationship("Character", back_populates='character_skills')
     skill = db.relationship("Skill", back_populates='character_skills')
 
+
 class Attribute(db.Model):
     __tablename__ = "attribute"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -80,6 +94,7 @@ class Attribute(db.Model):
     
     # Relationship to CharacterSkillAttribute
     character_skill_attributes = db.relationship("CharacterSkillAttribute", back_populates='attribute')
+
 
 class CharacterSkillAttribute(db.Model):
     __tablename__ = "character_skill_attribute"
@@ -92,15 +107,18 @@ class CharacterSkillAttribute(db.Model):
     skill = db.relationship("Skill", back_populates='character_skill_attributes')
     attribute = db.relationship("Attribute", back_populates='character_skill_attributes')
 
+
 class Origin(db.Model):
     __tablename__ = "origin"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String, nullable=False, unique=True)
     description = db.Column(db.Text, nullable=False)
+    selectable_traits_limit = db.Column(db.Integer, nullable=False, default=0)
 
     # Relationship to Trait and Character
     traits = db.relationship("Trait", back_populates='origin', cascade='all, delete-orphan')
     characters = db.relationship("Character", back_populates='origin')
+
 
 class Trait(db.Model):
     __tablename__ = "trait"
@@ -108,10 +126,12 @@ class Trait(db.Model):
     name = db.Column(db.String, nullable=False, unique=True)
     description = db.Column(db.Text, nullable=False)
     trait_data = db.Column(db.JSON, nullable=False)
+    is_selectable = db.Column(db.Boolean, default=False)
 
     # Relationship to Origin
     origin_id = db.Column(db.Integer, db.ForeignKey("origin.id"), nullable=False)
     origin = db.relationship("Origin", back_populates='traits')
+
 
 class Perk(db.Model):
     __tablename__ = "perk"
@@ -121,6 +141,7 @@ class Perk(db.Model):
     
     # Relationship to CharacterPerk
     character_perks = db.relationship("CharacterPerk", back_populates='perk')
+
 
 class CharacterPerk(db.Model):
     __tablename__ = "character_perk"

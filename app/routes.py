@@ -3,7 +3,7 @@ from flask import render_template, redirect, request, url_for, flash, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
 from app import app, db
 from app.forms import RegistrationForm, LoginForm, BackgroundForm, StatForm, PerkForm, DeleteForm, SkillForm
-from app.models import User, Character, Stat, CharacterStat, Perk, CharacterPerk, Skill, CharacterSkill, Origin
+from app.models import User, Character, Stat, CharacterStat, Perk, CharacterPerk, Skill, CharacterSkill, Origin, Trait
 from werkzeug.security import generate_password_hash, check_password_hash
 import logging
 
@@ -91,7 +91,7 @@ def delete_character(character_id):
 @app.route("/choose_origin", methods=["GET", "POST"])
 @login_required
 def choose_origin():
-    form = BackgroundForm()
+    form = BackgroundForm(origin_id=request.form.get('origin_id', type=int, default=-1))
 
     if form.validate_on_submit():
         new_character = Character(
@@ -101,6 +101,11 @@ def choose_origin():
         )
 
         db.session.add(new_character)
+        db.session.commit()
+
+        # Save selected selectable traits for the character
+        selected_traits = form.selectable_traits.data
+        new_character.selectable_traits = Trait.query.filter(Trait.id.in_(selected_traits)).all()
         db.session.commit()
 
         return redirect(url_for("choose_specials", character_id=new_character.id))
@@ -114,29 +119,29 @@ def get_origin_description():
     # Get the origin_id from the request arguments
     origin_id = request.args.get('origin_id', type=int)
     
-    # Query the database for the origin description and traits
+    # Query the database for the origin description
     origin = Origin.query.get(origin_id)
     
-    # Build the stat_ranges dictionary
-    stat_ranges = {}
-    for trait in origin.traits:
-        if "stat" in trait.trait_data:
-            stat_ranges[trait.trait_data["stat"]] = {
-                "min": 1,
-                "max": trait.trait_data["max"]
-            }
+    # Query the database for selectable traits
+    selectable_traits = [{"id": trait.id, "name": trait.name} for trait in origin.traits if trait.is_selectable]
+    
+    # Return the description and selectable traits as JSON
+    return jsonify(description=origin.description, selectable_traits=selectable_traits)
 
-    # Ensure all stats have default max value if not overridden by traits
-    stats = ["Strength", "Perception", "Endurance", "Charisma", "Intelligence", "Agility", "Luck"]
-    for stat in stats:
-        if stat not in stat_ranges:
-            stat_ranges[stat] = {
-                "min": 1,
-                "max": 10
-            }
 
-    # Return the description and stat ranges as JSON
-    return jsonify(description=origin.description, stat_ranges=stat_ranges)
+# @app.route("/choose_selectable_traits/<int:character_id>", methods=["GET", "POST"])
+# @login_required
+# def choose_selectable_traits(character_id):
+#     character = Character.query.get_or_404(character_id)
+#     form = SelectableTraitForm(origin_id=character.origin_id)
+
+#     if form.validate_on_submit():
+#         selected_traits = form.selectable_traits.data
+#         character.selectable_traits = Trait.query.filter(Trait.id.in_(selected_traits)).all()
+#         db.session.commit()
+#         return redirect(url_for("character_overview", character_id=character.id))
+
+#     return render_template("choose_selectable_traits.html", form=form, character=character)
 
 
 @app.route("/choose_specials/<int:character_id>", methods=["GET", "POST"])

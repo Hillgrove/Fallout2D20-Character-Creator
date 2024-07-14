@@ -1,6 +1,6 @@
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, IntegerField, SelectMultipleField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, IntegerField, SelectMultipleField, widgets
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError, NumberRange
 from app.models import User, Origin, Perk
 import logging
@@ -22,15 +22,39 @@ class LoginForm(FlaskForm):
     remember = BooleanField("Remember Me")
     submit = SubmitField("Login")
 
+
+from flask_wtf import FlaskForm
+from wtforms import StringField, SelectField, SelectMultipleField, SubmitField, widgets
+from wtforms.validators import DataRequired, ValidationError
+from app.models import Origin
+
 class BackgroundForm(FlaskForm):
     name = StringField("Character Name", validators=[DataRequired()])
     origin_id = SelectField("Origin", coerce=int, validators=[DataRequired()])
+    selectable_traits = SelectMultipleField("Selectable Traits", coerce=int, option_widget=widgets.CheckboxInput())
     submit = SubmitField("Next")
 
     def __init__(self, *args, **kwargs):
         super(BackgroundForm, self).__init__(*args, **kwargs)
         # Populate origin choices from the database with a default option
         self.origin_id.choices = [(-1, 'Select an Origin')] + [(origin.id, origin.name) for origin in Origin.query.all()]
+
+        self.origin = None
+        origin_id = kwargs.get('origin_id')
+        if origin_id and origin_id != -1:
+            self.origin = Origin.query.get(origin_id)
+            if self.origin:
+                self.selectable_traits.choices = [(trait.id, trait.name) for trait in self.origin.traits if trait.is_selectable]
+
+    def validate_origin_id(self, field):
+        if field.data == -1:
+            raise ValidationError('You must select a valid origin.')
+
+    def validate_selectable_traits(self, field):
+        if self.origin and len(field.data) > self.origin.selectable_traits_limit:
+            raise ValidationError(f'You can select up to {self.origin.selectable_traits_limit} traits only.')
+
+
 
 class StatForm(FlaskForm):
     strength = IntegerField('Strength', validators=[DataRequired(), NumberRange(min=1, max=10)])
