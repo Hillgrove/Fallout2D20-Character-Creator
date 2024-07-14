@@ -10,7 +10,7 @@ from app.models import Stat
 
 # Use the Flask application context
 with app.app_context():
-    special_stats = [
+    stats = [
         {"name": "Strength", "description": "A measure of your raw physical power. It affects how much you can carry and the damage of all melee attacks."},
         {"name": "Perception", "description": "A measure of your environmental and situational awareness. It affects weapon accuracy in V.A.T.S."},
         {"name": "Endurance", "description": "A measure of your overall physical fitness. It affects your total Health and the Action Point drain from sprinting."},
@@ -20,7 +20,7 @@ with app.app_context():
         {"name": "Luck", "description": "A measure of your general good fortune. It affects the recharge rate of Critical Hits."}
     ]
 
-    for stat in special_stats:
+    for stat in stats:
         existing_stat = Stat.query.filter_by(name=stat["name"]).first()
         if not existing_stat:
             new_stat = Stat(name=stat["name"], description=stat["description"])

@@ -95,12 +95,11 @@ class CharacterSkillAttribute(db.Model):
 class Origin(db.Model):
     __tablename__ = "origin"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name= db.Column(db.String, nullable=False, unique=True)
+    name = db.Column(db.String, nullable=False, unique=True)
     description = db.Column(db.Text, nullable=False)
-    trait_id = db.Column(db.Integer, db.ForeignKey("trait.id"), nullable=False)
 
     # Relationship to Trait and Character
-    trait = db.relationship("Trait", back_populates='origins')
+    traits = db.relationship("Trait", back_populates='origin', cascade='all, delete-orphan')
     characters = db.relationship("Character", back_populates='origin')
 
 class Trait(db.Model):
@@ -110,8 +109,9 @@ class Trait(db.Model):
     description = db.Column(db.Text, nullable=False)
     trait_data = db.Column(db.JSON, nullable=False)
 
-    # Relationship to Origins
-    origins = db.relationship("Origin", back_populates='trait')
+    # Relationship to Origin
+    origin_id = db.Column(db.Integer, db.ForeignKey("origin.id"), nullable=False)
+    origin = db.relationship("Origin", back_populates='traits')
 
 class Perk(db.Model):
     __tablename__ = "perk"

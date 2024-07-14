@@ -7,10 +7,11 @@ scripts_folder = os.path.dirname(__file__)
 
 # List of population scripts to run
 scripts = [
-    "populate_origins.py",
-    "populate_specials.py",
+    "populate_origins_and_traits.py",
+    "populate_stats.py",
     "populate_perks.py",
-    "populate_skills.py"
+    "populate_skills.py",
+    "populate_attributes.py"
 ]
 
 def run_script(script_folder, script_name):

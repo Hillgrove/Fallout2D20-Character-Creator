@@ -8,31 +8,31 @@
         {{ form.hidden_tag() }}
         <div class="form-group">
             {{ form.strength.label }}
-            {{ form.strength(class="form-control") }}
+            {{ form.strength(class="form-control", max=form.strength.validators[-1].max) }}
         </div>
         <div class="form-group">
             {{ form.perception.label }}
-            {{ form.perception(class="form-control") }}
+            {{ form.perception(class="form-control", max=form.perception.validators[-1].max) }}
         </div>
         <div class="form-group">
             {{ form.endurance.label }}
-            {{ form.endurance(class="form-control") }}
+            {{ form.endurance(class="form-control", max=form.endurance.validators[-1].max) }}
         </div>
         <div class="form-group">
             {{ form.charisma.label }}
-            {{ form.charisma(class="form-control") }}
+            {{ form.charisma(class="form-control", max=form.charisma.validators[-1].max) }}
         </div>
         <div class="form-group">
             {{ form.intelligence.label }}
-            {{ form.intelligence(class="form-control") }}
+            {{ form.intelligence(class="form-control", max=form.intelligence.validators[-1].max) }}
         </div>
         <div class="form-group">
             {{ form.agility.label }}
-            {{ form.agility(class="form-control") }}
+            {{ form.agility(class="form-control", max=form.agility.validators[-1].max) }}
         </div>
         <div class="form-group">
             {{ form.luck.label }}
-            {{ form.luck(class="form-control") }}
+            {{ form.luck(class="form-control", max=form.luck.validators[-1].max) }}
         </div>
         <div class="form-group">
             {{ form.submit(class="btn btn-primary") }}
