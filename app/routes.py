@@ -1,9 +1,9 @@
 
-from flask import render_template, redirect, request, url_for, flash
+from flask import render_template, redirect, request, url_for, flash, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
 from app import app, db
 from app.forms import RegistrationForm, LoginForm, BackgroundForm, SpecialForm, PerkForm, DeleteForm, SkillForm
-from app.models import User, Character, Stat, CharacterStat, Perk, CharacterPerk, Skill, CharacterSkill
+from app.models import User, Character, Stat, CharacterStat, Perk, CharacterPerk, Skill, CharacterSkill, Origin
 from werkzeug.security import generate_password_hash, check_password_hash
 
 @app.route("/")
@@ -97,6 +97,17 @@ def create_character():
     
     return render_template("create_character.html", form=form)
 
+@app.route("/get_origin_description")
+@login_required
+def get_origin_description():
+    # Get the origin_id from the request arguments
+    origin_id = request.args.get('origin_id', type=int)
+    
+    # Query the database for the origin description
+    origin = Origin.query.get(origin_id)
+    
+    # Return the description as JSON
+    return jsonify(description=origin.description)
 
 @app.route("/choose_specials/<int:character_id>", methods=["GET", "POST"])
 @login_required

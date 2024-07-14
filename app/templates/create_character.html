@@ -12,11 +12,31 @@
         </div>
         <div class="form-group">
             {{ form.origin_id.label(class="form-control-label") }}
-            {{ form.origin_id(class="form-control") }}
+            {{ form.origin_id(class="form-control", id="origin_id") }}
+        </div>
+        <div class="form-group">
+            <label for="origin_description" class="form-control-label">Background Description</label>
+            <p id="origin_description" class="form-control-static"></p>
         </div>
         <div class="form-group">
             {{ form.submit(class="btn btn-primary") }}
         </div>
     </form>
 </div>
+
+<script>
+// JavaScript to dynamically update the background description
+document.getElementById('origin_id').addEventListener('change', function() {
+    // Get the selected background ID
+    var originId = this.value;
+    
+    // Make an AJAX request to fetch the description
+    fetch('{{ url_for("get_origin_description") }}?origin_id=' + originId)
+        .then(response => response.json())
+        .then(data => {
+            // Update the description paragraph
+            document.getElementById('origin_description').innerText = data.description;
+        });
+});
+</script>
 {% endblock %}
