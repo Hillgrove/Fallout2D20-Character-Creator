@@ -97,21 +97,21 @@ class Origin(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name= db.Column(db.String, nullable=False, unique=True)
     description = db.Column(db.Text, nullable=False)
-    rule_id = db.Column(db.Integer, db.ForeignKey("rule.id"), nullable=False)
+    trait_id = db.Column(db.Integer, db.ForeignKey("trait.id"), nullable=False)
 
-    # Relationship to Rule and Character
-    rule = db.relationship("Rule", back_populates='origins')
+    # Relationship to Trait and Character
+    trait = db.relationship("Trait", back_populates='origins')
     characters = db.relationship("Character", back_populates='origin')
 
-class Rule(db.Model):
-    __tablename__ = "rule"
+class Trait(db.Model):
+    __tablename__ = "trait"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String, nullable=False, unique=True)
     description = db.Column(db.Text, nullable=False)
-    rule_data = db.Column(db.JSON, nullable=False)
+    trait_data = db.Column(db.JSON, nullable=False)
 
     # Relationship to Origins
-    origins = db.relationship("Origin", back_populates='rule')
+    origins = db.relationship("Origin", back_populates='trait')
 
 class Perk(db.Model):
     __tablename__ = "perk"
