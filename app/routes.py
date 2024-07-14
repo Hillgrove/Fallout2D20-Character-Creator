@@ -78,9 +78,9 @@ def delete_character(character_id):
     
 #     return render_template("edit_character.html", form=form, character=character)
 
-@app.route("/create_character", methods=["GET", "POST"])
+@app.route("/choose_origin", methods=["GET", "POST"])
 @login_required
-def create_character():
+def choose_origin():
     form = BackgroundForm()
 
     if form.validate_on_submit():
@@ -95,7 +95,7 @@ def create_character():
 
         return redirect(url_for("choose_specials", character_id=new_character.id))
     
-    return render_template("create_character.html", form=form)
+    return render_template("choose_origin.html", form=form)
 
 @app.route("/get_origin_description")
 @login_required
