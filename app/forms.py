@@ -5,11 +5,13 @@ from wtforms.validators import DataRequired, Length, EqualTo, ValidationError, N
 from app.models import User, Origin, Perk
 import logging
 
+
 class RegistrationForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired(), Length(min=2, max=20)])
     password = PasswordField("Password", validators=[DataRequired()])
     confirm_password = PasswordField("Confirm Password", validators=[DataRequired(), EqualTo("password")])
     submit = SubmitField("Sign Up")
+
 
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
@@ -22,11 +24,6 @@ class LoginForm(FlaskForm):
     remember = BooleanField("Remember Me")
     submit = SubmitField("Login")
 
-
-from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, SelectMultipleField, SubmitField, widgets
-from wtforms.validators import DataRequired, ValidationError
-from app.models import Origin
 
 class BackgroundForm(FlaskForm):
     name = StringField("Character Name", validators=[DataRequired()])
@@ -53,7 +50,6 @@ class BackgroundForm(FlaskForm):
     def validate_selectable_traits(self, field):
         if self.origin and len(field.data) > self.origin.selectable_traits_limit:
             raise ValidationError(f'You can select up to {self.origin.selectable_traits_limit} traits only.')
-
 
 
 class StatForm(FlaskForm):
@@ -105,6 +101,7 @@ class StatForm(FlaskForm):
         for stat_name, field in stat_fields.items():
             print(f"{stat_name} validators: {field.validators}")
 
+
 class PerkForm(FlaskForm):
     perks = SelectMultipleField("Perks", coerce=int, validators=[DataRequired()])
     submit = SubmitField("Next")
@@ -113,8 +110,10 @@ class PerkForm(FlaskForm):
         super(PerkForm, self).__init__(*args, **kwargs)
         self.perks.choices = [(perk.id, perk.name) for perk in Perk.query.all()]
 
+
 class DeleteForm(FlaskForm):
     pass
+
 
 class SkillForm(FlaskForm):
     skills = SelectMultipleField("Skills", coerce=int, validators=[DataRequired()])

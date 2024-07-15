@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container">
     <h1>Choose S.P.E.C.I.A.L. Stats for {{ character.name }}</h1>
-    <form method="POST" action="{{ url_for('choose_specials', character_id=character.id) }}">
+    <form method="POST" action="{{ url_for('choose_stats', character_id=character.id) }}">
         {{ form.hidden_tag() }}
         <div class="form-group">
             {{ form.strength.label }}

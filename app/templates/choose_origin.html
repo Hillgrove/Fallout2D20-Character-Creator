@@ -5,6 +5,8 @@
     <h1>Create Character</h1>
     <form method="POST" action="{{ url_for('choose_origin') }}">
         {{ form.hidden_tag() }}
+
+        <!-- Name section -->
         <div class="form-group">
             {{ form.name.label(class="form-control-label") }}
             {{ form.name(class="form-control") }}
@@ -12,6 +14,8 @@
                 <span class="text-danger">{{ error }}</span>
             {% endfor %}
         </div>
+
+        <!-- Origin section -->
         <div class="form-group">
             {{ form.origin_id.label(class="form-control-label") }}
             {{ form.origin_id(class="form-control", id="origin_id") }}
@@ -19,10 +23,22 @@
                 <span class="text-danger">{{ error }}</span>
             {% endfor %}
         </div>
+
+        <!-- Stat section -->
+        <div class="form-group">
+            <label class="form-control-label">S.P.E.C.I.A.L Stats</label>
+            <div id="special_stats">
+                <!-- Stats will be dynamically inserted here -->
+            </div>
+        </div>
+
+        <!-- Background description section -->
         <div class="form-group">
             <label for="origin_description" class="form-control-label">Background Description</label>
             <p id="origin_description" class="form-control-static"></p>
         </div>
+
+        <!-- Trait section -->
         <div class="form-group">
             {{ form.selectable_traits.label(class="form-control-label") }}
             <div id="selectable_traits">
@@ -37,14 +53,17 @@
                 <span class="text-danger">{{ error }}</span>
             {% endfor %}
         </div>
+
+        <!-- Next button -->
         <div class="form-group">
             {{ form.submit(class="btn btn-primary") }}
         </div>
+
     </form>
 </div>
 
 <script>
-// JavaScript to dynamically update the background description and selectable traits
+// JavaScript to dynamically update the background description, selectable traits, and S.P.E.C.I.A.L stats
 document.getElementById('origin_id').addEventListener('change', function() {
     // Get the selected background ID
     var originId = this.value;
@@ -52,10 +71,11 @@ document.getElementById('origin_id').addEventListener('change', function() {
     if (originId == -1) {
         document.getElementById('origin_description').innerText = '';
         document.getElementById('selectable_traits').innerHTML = '';
+        document.getElementById('special_stats').innerHTML = '';
         return;
     }
 
-    // Make an AJAX request to fetch the description and selectable traits
+    // Make an AJAX request to fetch the description, selectable traits, and S.P.E.C.I.A.L stats
     fetch('{{ url_for("get_origin_description") }}?origin_id=' + originId)
         .then(response => response.json())
         .then(data => {
@@ -86,6 +106,28 @@ document.getElementById('origin_id').addEventListener('change', function() {
                 div.appendChild(label);
 
                 traitsDiv.appendChild(div);
+            });
+
+            // Update the S.P.E.C.I.A.L stats
+            var statsDiv = document.getElementById('special_stats');
+            statsDiv.innerHTML = ''; // Clear previous stats
+
+            data.special_stats.forEach(function(stat) {
+                var div = document.createElement('div');
+                div.className = 'form-group';
+
+                var label = document.createElement('label');
+                label.className = 'form-control-label';
+                label.innerText = stat.name + ': ';
+
+                var span = document.createElement('span');
+                span.className = 'form-control-static';
+                span.innerText = ' ' + stat.min + ' - ' + stat.max;
+
+                div.appendChild(label);
+                div.appendChild(span);
+
+                statsDiv.appendChild(div);
             });
         });
 });

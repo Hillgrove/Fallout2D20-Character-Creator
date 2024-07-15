@@ -108,7 +108,7 @@ def choose_origin():
         new_character.selectable_traits = Trait.query.filter(Trait.id.in_(selected_traits)).all()
         db.session.commit()
 
-        return redirect(url_for("choose_specials", character_id=new_character.id))
+        return redirect(url_for("choose_stats", character_id=new_character.id))
     
     return render_template("choose_origin.html", form=form)
 
@@ -125,8 +125,22 @@ def get_origin_description():
     # Query the database for selectable traits
     selectable_traits = [{"id": trait.id, "name": trait.name} for trait in origin.traits if trait.is_selectable]
     
-    # Return the description and selectable traits as JSON
-    return jsonify(description=origin.description, selectable_traits=selectable_traits)
+    # Query the database for S.P.E.C.I.A.L stats
+    special_stats = []
+    stat_names = ["Strength", "Perception", "Endurance", "Charisma", "Intelligence", "Agility", "Luck"]
+    default_range = {"min": 1, "max": 10}
+    for stat_name in stat_names:
+        stat_range = next((trait.trait_data for trait in origin.traits if trait.trait_data.get("stat") == stat_name), default_range)
+        special_stats.append({
+            "name": stat_name,
+            "min": stat_range.get("min", default_range["min"]),
+            "max": stat_range.get("max", default_range["max"])
+        })
+
+    # Return the description, selectable traits, and special stats as JSON
+    return jsonify(description=origin.description, selectable_traits=selectable_traits, special_stats=special_stats)
+
+
 
 
 # @app.route("/choose_selectable_traits/<int:character_id>", methods=["GET", "POST"])
@@ -144,9 +158,9 @@ def get_origin_description():
 #     return render_template("choose_selectable_traits.html", form=form, character=character)
 
 
-@app.route("/choose_specials/<int:character_id>", methods=["GET", "POST"])
+@app.route("/choose_stats/<int:character_id>", methods=["GET", "POST"])
 @login_required
-def choose_specials(character_id):
+def choose_stats(character_id):
     character = Character.query.get_or_404(character_id)
     form = StatForm(origin_id=character.origin_id)
 
@@ -185,7 +199,7 @@ def choose_specials(character_id):
                 logging.error(f"Error saving stats: {e}")
                 flash("An error occurred while saving your stats. Please try again.", "danger")
 
-    return render_template("choose_specials.html", form=form, character=character, stats=Stat.query.all())
+    return render_template("choose_stats.html", form=form, character=character, stats=Stat.query.all())
 
 
 @app.route("/choose_perks/<int:character_id>", methods=["GET", "POST"])
