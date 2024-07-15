@@ -181,6 +181,12 @@ def choose_stats(character_id):
                     "Luck": form.luck.data
                 }
 
+                # Check if the total points spent are within the allowed range
+                total_spent_points = sum(stats.values())
+                if total_spent_points > character.starting_stat_points:
+                    flash("You have exceeded the allowed stat points.", "danger")
+                    return render_template("choose_stats.html", form=form, character=character, stats=Stat.query.all())
+
                 # Loop through each stat and save the selected value
                 for stat_name, stat_value in stats.items():
                     stat = Stat.query.filter_by(name=stat_name).first()
@@ -200,6 +206,7 @@ def choose_stats(character_id):
                 flash("An error occurred while saving your stats. Please try again.", "danger")
 
     return render_template("choose_stats.html", form=form, character=character, stats=Stat.query.all())
+
 
 
 @app.route("/choose_perks/<int:character_id>", methods=["GET", "POST"])

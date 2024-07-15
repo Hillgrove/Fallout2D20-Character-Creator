@@ -6,6 +6,10 @@
     <form method="POST" action="{{ url_for('choose_stats', character_id=character.id) }}">
         {{ form.hidden_tag() }}
 
+        <div class="form-group">
+            <label>Total Points Available: <span id="total_points"></span></label>
+        </div>
+
         <!-- Strength -->
         <div class="form-group">
             {{ form.strength.label }}
@@ -121,7 +125,41 @@ function changeStatValue(statId, delta) {
     // Ensure the value stays within the allowed range
     if (value >= min && value <= max) {
         input.value = value;
+
+        // Update the total points
+        updateTotalPoints();
     }
 }
+
+function updateTotalPoints() {
+    var totalPoints = {{ character.starting_stat_points }};
+    var spentPoints = 0;
+    var statIds = ['strength', 'perception', 'endurance', 'charisma', 'intelligence', 'agility', 'luck'];
+
+    // Calculate spent points as the sum of all stat values
+    statIds.forEach(function(statId) {
+        var input = document.getElementById(statId);
+        spentPoints += parseInt(input.value);
+    });
+
+    // Update the total points display
+    var remainingPoints = totalPoints - spentPoints;
+    document.getElementById('total_points').innerText = remainingPoints;
+
+    // Disable/enable buttons based on remaining points
+    statIds.forEach(function(statId) {
+        var input = document.getElementById(statId);
+        var value = parseInt(input.value);
+
+        // Disable increase button if no points left or value is max
+        document.querySelector(`button[onclick="changeStatValue('${statId}', 1)"]`).disabled = remainingPoints <= 0 || value >= parseInt(input.max);
+
+        // Disable decrease button if value is min
+        document.querySelector(`button[onclick="changeStatValue('${statId}', -1)"]`).disabled = value <= parseInt(input.min);
+    });
+}
+
+// Initial call to update the total points
+updateTotalPoints();
 </script>
 {% endblock %}

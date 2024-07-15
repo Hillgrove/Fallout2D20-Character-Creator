@@ -28,6 +28,7 @@ class Character(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String, nullable=False)
     current_xp = db.Column(db.Integer, default=0, nullable=False)
+    starting_stat_points = db.Column(db.Integer, nullable=False, default=40)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     origin_id = db.Column(db.Integer, db.ForeignKey("origin.id"), nullable=False)
 
