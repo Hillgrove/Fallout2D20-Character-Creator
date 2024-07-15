@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Choose S.P.E.C.I.A.L. Stats for {{ character.name }}</h1>
+    <form method="POST" action="{{ url_for('choose_stats', character_id=character.id) }}">
+        {{ form.hidden_tag() }}
+
+        <!-- Strength -->
+        <div class="form-group">
+            {{ form.strength.label }}
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('strength', -1)">-</button>
+                </div>
+                <input type="number" name="strength" id="strength" class="form-control text-center" value="{{ form.strength.data or 5 }}" min="{{ form.strength.validators[-1].min }}" max="{{ form.strength.validators[-1].max }}" readonly>
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('strength', 1)">+</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Perception -->
+        <div class="form-group">
+            {{ form.perception.label }}
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('perception', -1)">-</button>
+                </div>
+                <input type="number" name="perception" id="perception" class="form-control text-center" value="{{ form.perception.data or 5 }}" min="{{ form.perception.validators[-1].min }}" max="{{ form.perception.validators[-1].max }}" readonly>
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('perception', 1)">+</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Endurance -->
+        <div class="form-group">
+            {{ form.endurance.label }}
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('endurance', -1)">-</button>
+                </div>
+                <input type="number" name="endurance" id="endurance" class="form-control text-center" value="{{ form.endurance.data or 5 }}" min="{{ form.endurance.validators[-1].min }}" max="{{ form.endurance.validators[-1].max }}" readonly>
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('endurance', 1)">+</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charisma -->
+        <div class="form-group">
+            {{ form.charisma.label }}
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('charisma', -1)">-</button>
+                </div>
+                <input type="number" name="charisma" id="charisma" class="form-control text-center" value="{{ form.charisma.data or 5 }}" min="{{ form.charisma.validators[-1].min }}" max="{{ form.charisma.validators[-1].max }}" readonly>
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('charisma', 1)">+</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Intelligence -->
+        <div class="form-group">
+            {{ form.intelligence.label }}
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('intelligence', -1)">-</button>
+                </div>
+                <input type="number" name="intelligence" id="intelligence" class="form-control text-center" value="{{ form.intelligence.data or 5 }}" min="{{ form.intelligence.validators[-1].min }}" max="{{ form.intelligence.validators[-1].max }}" readonly>
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('intelligence', 1)">+</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agility -->
+        <div class="form-group">
+            {{ form.agility.label }}
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('agility', -1)">-</button>
+                </div>
+                <input type="number" name="agility" id="agility" class="form-control text-center" value="{{ form.agility.data or 5 }}" min="{{ form.agility.validators[-1].min }}" max="{{ form.agility.validators[-1].max }}" readonly>
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('agility', 1)">+</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Luck -->
+        <div class="form-group">
+            {{ form.luck.label }}
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('luck', -1)">-</button>
+                </div>
+                <input type="number" name="luck" id="luck" class="form-control text-center" value="{{ form.luck.data or 5 }}" min="{{ form.luck.validators[-1].min }}" max="{{ form.luck.validators[-1].max }}" readonly>
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('luck', 1)">+</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+</div>
+
+<script>
+function changeStatValue(statId, delta) {
+    // Get the input element by ID
+    var input = document.getElementById(statId);
+    var min = parseInt(input.min);
+    var max = parseInt(input.max);
+    var value = parseInt(input.value) + delta;
+
+    // Ensure the value stays within the allowed range
+    if (value >= min && value <= max) {
+        input.value = value;
+    }
+}
+</script>
+{% endblock %}
