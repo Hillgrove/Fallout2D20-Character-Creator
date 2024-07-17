@@ -1,6 +1,6 @@
-
 import os
 import sys
+import logging
 
 # Ensure the 'scripts' directory is added to the system path to find 'app'
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -8,9 +8,23 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from app import app, db
 from app.models import Skill
 
-# Use the Flask application context
-with app.app_context():
-    # List of skills to add to the database
+logging.basicConfig(level=logging.INFO)
+
+def add_skills(skills):
+    with app.app_context():
+        for skill in skills:
+            existing_skill = Skill.query.filter_by(name=skill["name"]).first()
+            if not existing_skill:
+                new_skill = Skill(name=skill["name"], description=skill["description"])
+                db.session.add(new_skill)
+                logging.info(f"Added new skill: {skill['name']}")
+            else:
+                logging.info(f"Skill already exists: {skill['name']}")
+
+        db.session.commit()
+        logging.info("Skills added to the database.")
+
+if __name__ == "__main__":
     skills = [
         {"name": "Athletics", "description": "Physical fitness and agility."},
         {"name": "Barter", "description": "Negotiating and trading skills."},
@@ -28,13 +42,8 @@ with app.app_context():
         {"name": "Unarmed", "description": "Hand-to-hand combat skills."}
     ]
 
-    # Add each skill to the database if it does not already exist
-    for skill in skills:
-        existing_skill = Skill.query.filter_by(name=skill["name"]).first()
-        if not existing_skill:
-            new_skill = Skill(name=skill["name"], description=skill["description"])
-            db.session.add(new_skill)
-
-    # Commit the changes to the database
-    db.session.commit()
-    print("Skills added to the database.")
+    try:
+        add_skills(skills)
+    except Exception as e:
+        logging.error(f"Error adding skills to the database: {e}")
+        sys.exit(1)

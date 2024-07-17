@@ -1,13 +1,18 @@
 import os
 import subprocess
 import sys
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Define the folder containing the scripts
 scripts_folder = os.path.dirname(__file__)
 
 # List of population scripts to run
 scripts = [
-    "populate_origins_and_traits.py",
+    "populate_traits.py",
+    "populate_origins.py",
     "populate_stats.py",
     "populate_perks.py",
     "populate_skills.py",
@@ -20,11 +25,11 @@ def run_script(script_folder, script_name):
     try:
         # Ensure the working directory is set to the script folder
         result = subprocess.run([python_executable, script_path], check=True, capture_output=True, text=True, cwd=script_folder)
-        print(f"Script {script_path} executed successfully.")
-        print(result.stdout)
+        logging.info(f"Script {script_path} executed successfully.")
+        logging.info(result.stdout)
     except subprocess.CalledProcessError as e:
-        print(f"An error occurred while running script {script_path}.")
-        print(e.stderr)
+        logging.error(f"An error occurred while running script {script_path}.")
+        logging.error(e.stderr)
 
 def main():
     for script in scripts:

@@ -1,6 +1,6 @@
-
 import os
 import sys
+import logging
 
 # Ensure the 'scripts' directory is added to the system path to find 'app'
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -8,8 +8,23 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from app import app, db
 from app.models import Stat
 
-# Use the Flask application context
-with app.app_context():
+logging.basicConfig(level=logging.INFO)
+
+def add_stats(stats):
+    with app.app_context():
+        for stat in stats:
+            existing_stat = Stat.query.filter_by(name=stat["name"]).first()
+            if not existing_stat:
+                new_stat = Stat(name=stat["name"], description=stat["description"])
+                db.session.add(new_stat)
+                logging.info(f"Added new stat: {stat['name']}")
+            else:
+                logging.info(f"Stat already exists: {stat['name']}")
+
+        db.session.commit()
+        logging.info("S.P.E.C.I.A.L. stats added to the database.")
+
+if __name__ == "__main__":
     stats = [
         {"name": "Strength", "description": "A measure of your raw physical power. It affects how much you can carry and the damage of all melee attacks."},
         {"name": "Perception", "description": "A measure of your environmental and situational awareness. It affects weapon accuracy in V.A.T.S."},
@@ -20,11 +35,8 @@ with app.app_context():
         {"name": "Luck", "description": "A measure of your general good fortune. It affects the recharge rate of Critical Hits."}
     ]
 
-    for stat in stats:
-        existing_stat = Stat.query.filter_by(name=stat["name"]).first()
-        if not existing_stat:
-            new_stat = Stat(name=stat["name"], description=stat["description"])
-            db.session.add(new_stat)
-
-    db.session.commit()
-    print("S.P.E.C.I.A.L. stats added to the database.")
+    try:
+        add_stats(stats)
+    except Exception as e:
+        logging.error(f"Error adding stats to the database: {e}")
+        sys.exit(1)
