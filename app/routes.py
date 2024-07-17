@@ -3,7 +3,7 @@ from flask import render_template, redirect, request, url_for, flash, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
 from app import app, db
 from app.forms import RegistrationForm, LoginForm, BackgroundForm, StatForm, PerkForm, DeleteForm, SkillForm
-from app.models import User, Character, Stat, CharacterStat, Perk, CharacterPerk, Skill, CharacterSkill, Origin, Trait
+from app.models import User, Character, Stat, CharacterStat, Perk, CharacterPerk, Skill, Origin, OriginTrait, CharacterSkillAttribute
 from werkzeug.security import generate_password_hash, check_password_hash
 import logging
 
@@ -67,95 +67,61 @@ def dashboard():
 @login_required
 def delete_character(character_id):
     character = Character.query.get_or_404(character_id)
+    if character.user_id != current_user.id:
+        flash("You do not have permission to delete this character", "danger")
+        return redirect(url_for("dashboard"))
     db.session.delete(character)
     db.session.commit()
     flash("Character successfully deleted", "success")
     return redirect(url_for("dashboard"))
 
 
-# @app.route("/edit_character/<int:character_id>", methods=["POST"])
-# @login_required
-# def edit_character(character_id):
-#     character = Character.query.get_or_404(character_id)
-#     form = CharacterForm(obj=character)
-
-#     if form.validate_on_submit():
-#         form.populate_obj(character)
-#         db.session.commit()
-#         flash("Character updated successfully", "success")
-#         return redirect(url_for("dashboard"))
-    
-#     return render_template("edit_character.html", form=form, character=character)
-
-
 @app.route("/choose_origin", methods=["GET", "POST"])
 @login_required
 def choose_origin():
-    form = BackgroundForm(origin_id=request.form.get('origin_id', type=int, default=-1))
-
+    form = BackgroundForm()
+    # form = BackgroundForm(origin_id=request.form.get('origin_id', type=int, default=-1))
     if form.validate_on_submit():
         new_character = Character(
             name=form.name.data,
             origin_id=form.origin_id.data,
             user_id=current_user.id
         )
-
         db.session.add(new_character)
         db.session.commit()
 
-        # Save selected selectable traits for the character
         selected_traits = form.selectable_traits.data
-        new_character.selectable_traits = Trait.query.filter(Trait.id.in_(selected_traits)).all()
+        origin_traits = OriginTrait.query.filter(OriginTrait.trait_id.in_(selected_traits)).all()
+        for origin_trait in origin_traits:
+            new_character.traits.append(origin_trait.trait)
         db.session.commit()
 
         return redirect(url_for("choose_stats", character_id=new_character.id))
-    
     return render_template("choose_origin.html", form=form)
 
 
 @app.route("/get_origin_description")
 @login_required
 def get_origin_description():
-    # Get the origin_id from the request arguments
     origin_id = request.args.get('origin_id', type=int)
-    
-    # Query the database for the origin description
-    origin = Origin.query.get(origin_id)
-    
-    # Query the database for selectable traits
-    selectable_traits = [{"id": trait.id, "name": trait.name} for trait in origin.traits if trait.is_selectable]
-    
-    # Query the database for S.P.E.C.I.A.L stats
-    special_stats = []
-    stat_names = ["Strength", "Perception", "Endurance", "Charisma", "Intelligence", "Agility", "Luck"]
-    default_range = {"min": 1, "max": 10}
-    for stat_name in stat_names:
-        stat_range = next((trait.trait_data for trait in origin.traits if trait.trait_data.get("stat") == stat_name), default_range)
-        special_stats.append({
-            "name": stat_name,
-            "min": stat_range.get("min", default_range["min"]),
-            "max": stat_range.get("max", default_range["max"])
-        })
+    origin = Origin.query.get_or_404(origin_id)
 
-    # Return the description, selectable traits, and special stats as JSON
-    return jsonify(description=origin.description, selectable_traits=selectable_traits, special_stats=special_stats)
+    # Fetch all default stats from the Stat table
+    default_stats = [{"name": stat.name, "min": 4, "max": 10} for stat in Stat.query.all()]
+
+    # Adjust stats based on origin traits
+    for trait in origin.origin_traits:
+        if "stat" in trait.trait.trait_data:
+            for stat in default_stats:
+                if stat["name"] == trait.trait.trait_data["stat"]:
+                    stat["max"] = trait.trait.trait_data.get("max", stat["max"])
+                    stat["min"] = trait.trait.trait_data.get("min", stat["min"])
+
+    selectable_traits = [{"id": trait.trait.id, "name": trait.trait.name} for trait in origin.origin_traits if trait.trait.is_selectable]
+
+    return jsonify(description=origin.description, selectable_traits=selectable_traits, special_stats=default_stats)
 
 
-
-
-# @app.route("/choose_selectable_traits/<int:character_id>", methods=["GET", "POST"])
-# @login_required
-# def choose_selectable_traits(character_id):
-#     character = Character.query.get_or_404(character_id)
-#     form = SelectableTraitForm(origin_id=character.origin_id)
-
-#     if form.validate_on_submit():
-#         selected_traits = form.selectable_traits.data
-#         character.selectable_traits = Trait.query.filter(Trait.id.in_(selected_traits)).all()
-#         db.session.commit()
-#         return redirect(url_for("character_overview", character_id=character.id))
-
-#     return render_template("choose_selectable_traits.html", form=form, character=character)
 
 
 @app.route("/choose_stats/<int:character_id>", methods=["GET", "POST"])
@@ -163,50 +129,27 @@ def get_origin_description():
 def choose_stats(character_id):
     character = Character.query.get_or_404(character_id)
     form = StatForm(origin_id=character.origin_id)
+    if form.validate_on_submit():
+        try:
+            CharacterStat.query.filter_by(character_id=character.id).delete()
+            stats = {stat_name: getattr(form, stat_name.lower()).data for stat_name in ["Strength", "Perception", "Endurance", "Charisma", "Intelligence", "Agility", "Luck"]}
+            if sum(stats.values()) > character.starting_stat_points:
+                flash("You have exceeded the allowed stat points.", "danger")
+                return render_template("choose_stats.html", form=form, character=character, stats=Stat.query.all())
 
-    if request.method == "POST":
-        if form.validate_on_submit():
-            try:
-                # Remove existing CharacterStat entries for the character to avoid duplicates
-                CharacterStat.query.filter_by(character_id=character.id).delete()
+            for stat_name, stat_value in stats.items():
+                stat = Stat.query.filter_by(name=stat_name).first()
+                if stat:
+                    character_stat = CharacterStat(character_id=character.id, stat_id=stat.id, value=stat_value)
+                    db.session.add(character_stat)
 
-                # Create a list of the form data to handle each stat
-                stats = {
-                    "Strength": form.strength.data,
-                    "Perception": form.perception.data,
-                    "Endurance": form.endurance.data,
-                    "Charisma": form.charisma.data,
-                    "Intelligence": form.intelligence.data,
-                    "Agility": form.agility.data,
-                    "Luck": form.luck.data
-                }
-
-                # Check if the total points spent are within the allowed range
-                total_spent_points = sum(stats.values())
-                if total_spent_points > character.starting_stat_points:
-                    flash("You have exceeded the allowed stat points.", "danger")
-                    return render_template("choose_stats.html", form=form, character=character, stats=Stat.query.all())
-
-                # Loop through each stat and save the selected value
-                for stat_name, stat_value in stats.items():
-                    stat = Stat.query.filter_by(name=stat_name).first()
-                    if stat:
-                        character_stat = CharacterStat(
-                            character_id=character.id,
-                            stat_id=stat.id,
-                            value=stat_value
-                        )
-                        db.session.add(character_stat)
-
-                db.session.commit()
-                return redirect(url_for("choose_perks", character_id=character.id))
-            except Exception as e:
-                db.session.rollback()
-                logging.error(f"Error saving stats: {e}")
-                flash("An error occurred while saving your stats. Please try again.", "danger")
-
+            db.session.commit()
+            return redirect(url_for("choose_perks", character_id=character.id))
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"Error saving stats: {e}")
+            flash("An error occurred while saving your stats. Please try again.", "danger")
     return render_template("choose_stats.html", form=form, character=character, stats=Stat.query.all())
-
 
 
 @app.route("/choose_perks/<int:character_id>", methods=["GET", "POST"])
@@ -236,36 +179,30 @@ def choose_perks(character_id):
 def choose_skills(character_id):
     character = Character.query.get_or_404(character_id)
     form = SkillForm()
-    
-    # Populate the skill choices
     form.skills.choices = [(skill.id, skill.name) for skill in Skill.query.all()]
-
     if form.validate_on_submit():
-        # Clear existing CharacterSkill entries to avoid duplicates
-        CharacterSkill.query.filter_by(character_id=character.id).delete()
-
-        # Add selected skills to the character
+        CharacterSkillAttribute.query.filter_by(character_id=character.id).delete()
         for skill_id in form.skills.data:
-            character_skill = CharacterSkill(character_id=character.id, skill_id=skill_id)
-            db.session.add(character_skill)
-
+            character_skill_attribute = CharacterSkillAttribute(
+                character_id=character.id,
+                skill_id=skill_id,
+                attribute_id=None,  # Assuming no attribute at this stage
+                value=0  # Assuming a default value
+            )
+            db.session.add(character_skill_attribute)
         db.session.commit()
-
         flash("Skills successfully selected", "success")
         return redirect(url_for("character_overview", character_id=character.id))
-
     return render_template("choose_skills.html", form=form, character=character)
 
 
 @app.route("/character_overview/<int:character_id>")
 @login_required
 def character_overview(character_id):
-    # Fetch the character from the database
     character = Character.query.get_or_404(character_id)
 
-    # Fetch related stats, skills, and perks
     character_stats = CharacterStat.query.filter_by(character_id=character.id).all()
-    character_skills = CharacterSkill.query.filter_by(character_id=character.id).all()
+    character_skill_attributes = CharacterSkillAttribute.query.filter_by(character_id=character.id).all()
     character_perks = CharacterPerk.query.filter_by(character_id=character.id).all()
 
-    return render_template("character_overview.html", character=character, character_stats=character_stats, character_skills=character_skills, character_perks=character_perks)
+    return render_template("character_overview.html", character=character, character_stats=character_stats, character_skill_attributes=character_skill_attributes, character_perks=character_perks)

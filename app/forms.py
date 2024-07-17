@@ -1,8 +1,7 @@
-
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, IntegerField, SelectMultipleField, widgets
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError, NumberRange
-from app.models import User, Origin, Perk
+from app.models import User, Origin, Trait, Perk
 import logging
 
 
@@ -12,12 +11,12 @@ class RegistrationForm(FlaskForm):
     confirm_password = PasswordField("Confirm Password", validators=[DataRequired(), EqualTo("password")])
     submit = SubmitField("Sign Up")
 
-
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
         if user:
             raise ValidationError("That username is taken. Please choose a different one")
-        
+
+
 class LoginForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired(), Length(min=2, max=20)])
     password = PasswordField("Password", validators=[DataRequired()])
@@ -31,17 +30,15 @@ class BackgroundForm(FlaskForm):
     selectable_traits = SelectMultipleField("Selectable Traits", coerce=int, option_widget=widgets.CheckboxInput())
     submit = SubmitField("Next")
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, origin_id=None, *args, **kwargs):
         super(BackgroundForm, self).__init__(*args, **kwargs)
-        # Populate origin choices from the database with a default option
         self.origin_id.choices = [(-1, 'Select an Origin')] + [(origin.id, origin.name) for origin in Origin.query.all()]
 
         self.origin = None
-        origin_id = kwargs.get('origin_id')
         if origin_id and origin_id != -1:
             self.origin = Origin.query.get(origin_id)
             if self.origin:
-                self.selectable_traits.choices = [(trait.id, trait.name) for trait in self.origin.traits if trait.is_selectable]
+                self.selectable_traits.choices = [(trait.trait.id, trait.trait.name) for trait in self.origin.origin_traits if trait.trait.is_selectable]
 
     def validate_origin_id(self, field):
         if field.data == -1:
@@ -67,7 +64,6 @@ class StatForm(FlaskForm):
         self.origin_id = origin_id
         self.origin = Origin.query.get(origin_id)
 
-        # Create a dictionary of stat field names and their corresponding field objects
         stat_fields = {
             'Strength': self.strength,
             'Perception': self.perception,
@@ -78,28 +74,16 @@ class StatForm(FlaskForm):
             'Luck': self.luck
         }
 
-        # Update validators based on traits
-        for trait in self.origin.traits:
-            logging.info(f"Processing trait: {trait.name}")
-            if "stat" in trait.trait_data:
-                stat_name = trait.trait_data["stat"]
-                max_value = trait.trait_data["max"]
-                logging.info(f"Setting max value for {stat_name} to {max_value}")
-                if stat_name in stat_fields:
-                    field = stat_fields[stat_name]
-                    # Update the field validators
-                    field.validators = [v for v in field.validators if not isinstance(v, NumberRange)]
-                    field.validators.append(NumberRange(min=1, max=max_value))
-                    logging.info(f"{stat_name} validators: {field.validators}")
-
-        # Log the final validators for each stat
-        for stat_name, field in stat_fields.items():
-            logging.info(f"{stat_name} final validators: {field.validators}")
-
-
-        # Print out the validators for debugging purposes
-        for stat_name, field in stat_fields.items():
-            print(f"{stat_name} validators: {field.validators}")
+        if self.origin:
+            for origin_trait in self.origin.origin_traits:
+                trait = origin_trait.trait
+                if "stat" in trait.trait_data:
+                    stat_name = trait.trait_data["stat"]
+                    max_value = trait.trait_data["max"]
+                    if stat_name in stat_fields:
+                        field = stat_fields[stat_name]
+                        field.validators = [v for v in field.validators if not isinstance(v, NumberRange)]
+                        field.validators.append(NumberRange(min=1, max=max_value))
 
 
 class PerkForm(FlaskForm):
@@ -118,3 +102,7 @@ class DeleteForm(FlaskForm):
 class SkillForm(FlaskForm):
     skills = SelectMultipleField("Skills", coerce=int, validators=[DataRequired()])
     submit = SubmitField("Next")
+
+    def __init__(self, *args, **kwargs):
+        super(SkillForm, self).__init__(*args, **kwargs)
+        self.skills.choices = [(skill.id, skill.name) for skill in Skill.query.all()]
