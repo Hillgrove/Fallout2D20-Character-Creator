@@ -2,8 +2,8 @@
 from flask import render_template, redirect, request, url_for, flash, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
 from app import app, db
-from app.forms import RegistrationForm, LoginForm, BackgroundForm, StatForm, PerkForm, DeleteForm, SkillForm
-from app.models import User, Character, Stat, CharacterStat, Perk, CharacterPerk, Skill, Origin, OriginTrait, CharacterSkillAttribute
+from app.forms import RegistrationForm, LoginForm, BackgroundForm, SkillField, StatForm, PerkForm, DeleteForm, SkillForm
+from app.models import User, Character, Stat, CharacterStat, Perk, CharacterPerk, Skill, Origin, OriginTrait, CharacterSkillAttribute, Attribute
 from werkzeug.security import generate_password_hash, check_password_hash
 import logging
 
@@ -176,22 +176,35 @@ def choose_perks(character_id):
 @login_required
 def choose_skills(character_id):
     character = Character.query.get_or_404(character_id)
+    skills = Skill.query.all()
     form = SkillForm()
-    form.skills.choices = [(skill.id, skill.name) for skill in Skill.query.all()]
+    
+    if request.method == 'GET':
+        # Populate the form with a field for each skill with default values
+        for skill in skills:
+            form.skills.append_entry({'ranks': 0, 'tagged': False})
+    
     if form.validate_on_submit():
-        CharacterSkillAttribute.query.filter_by(character_id=character.id).delete()
-        for skill_id in form.skills.data:
+        # Process form data
+        for i, skill_form in enumerate(form.skills.entries):
+            skill = skills[i]
+            ranks = skill_form.ranks.data
+            tagged = skill_form.tagged.data
+            attribute = Attribute.query.filter_by(name='Tagged').first()
+            
             character_skill_attribute = CharacterSkillAttribute(
                 character_id=character.id,
-                skill_id=skill_id,
-                attribute_id=None,  # Assuming no attribute at this stage
-                value=0  # Assuming a default value
+                skill_id=skill.id,
+                attribute_id=attribute.id if tagged else None,
+                value=ranks
             )
             db.session.add(character_skill_attribute)
         db.session.commit()
         flash("Skills successfully selected", "success")
         return redirect(url_for("character_overview", character_id=character.id))
-    return render_template("choose_skills.html", form=form, character=character)
+    
+    return render_template("choose_skills.html", form=form, character=character, skills=skills)
+
 
 
 @app.route("/character_overview/<int:character_id>")

@@ -1,8 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, IntegerField, SelectMultipleField, widgets
+from wtforms import  BooleanField, FieldList, FormField, IntegerField, PasswordField, SelectField, SelectMultipleField, StringField, SubmitField, widgets
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError, NumberRange
-from app.models import User, Origin, Trait, Perk
-import logging
+from app.models import User, Origin, Perk, Skill
 
 
 class RegistrationForm(FlaskForm):
@@ -99,10 +98,12 @@ class DeleteForm(FlaskForm):
     pass
 
 
-class SkillForm(FlaskForm):
-    skills = SelectMultipleField("Skills", coerce=int, validators=[DataRequired()])
-    submit = SubmitField("Next")
+class SkillField(FlaskForm):
+    ranks = IntegerField('Ranks', default=0, validators=[DataRequired(), NumberRange(min=0)])
+    tagged = BooleanField('Tagged', default=False)
 
-    def __init__(self, *args, **kwargs):
-        super(SkillForm, self).__init__(*args, **kwargs)
-        self.skills.choices = [(skill.id, skill.name) for skill in Skill.query.all()]
+class SkillForm(FlaskForm):
+    skills = FieldList(FormField(SkillField))
+    submit = SubmitField('Next')
+
+

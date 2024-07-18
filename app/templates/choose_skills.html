@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 
 {% block content %}
@@ -7,12 +6,67 @@
     <form method="POST" action="{{ url_for('choose_skills', character_id=character.id) }}">
         {{ form.hidden_tag() }}
         <div class="form-group">
-            {{ form.skills.label }}
-            {{ form.skills(class="form-control") }}
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <h3>Skill</h3>
+                </div>
+                <div class="col-md-4">
+                    <h3>Tag</h3>
+                </div>
+                <div class="col-md-4">
+                    <h3>Sum</h3>
+                </div>
+            </div>
+            {% for i in range(skills|length) %}
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label>{{ skills[i].name }}</label>
+                    {{ form.skills[i].ranks(class="form-control", type="number", placeholder="Ranks", id="form-skills-" ~ i ~ "-ranks", oninput="updateSum(" ~ i ~ ")") }}
+                </div>
+                <div class="col-md-4 d-flex align-items-center">
+                    {{ form.skills[i].tagged(class="form-check-input", id="form-skills-" ~ i ~ "-tagged", onchange="updateSum(" ~ i ~ ")") }}
+                </div>
+                <div class="col-md-4 d-flex align-items-center">
+                    <span id="sum-{{ i }}">0</span>
+                </div>
+            </div>
+            {% endfor %}
         </div>
         <div class="form-group">
             {{ form.submit(class="btn btn-primary") }}
         </div>
     </form>
 </div>
+
+<script>
+    function updateSum(index) {
+        const ranksInput = document.getElementById('form-skills-' + index + '-ranks');
+        const taggedCheckbox = document.getElementById('form-skills-' + index + '-tagged');
+        const sumSpan = document.getElementById('sum-' + index);
+
+        if (!ranksInput || !taggedCheckbox || !sumSpan) {
+            console.error('Elements not found for index ' + index);
+            return;
+        }
+
+        let sum = parseInt(ranksInput.value) || 0;
+
+        if (taggedCheckbox.checked) {
+            sum += 2;
+        }
+
+        sumSpan.textContent = sum;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkboxes = document.querySelectorAll('.form-check-input');
+        const rankInputs = document.querySelectorAll('.form-control[type="number"]');
+
+        for (let i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].addEventListener('change', function() { updateSum(i); });
+            rankInputs[i].addEventListener('input', function() { updateSum(i); });
+            updateSum(i); // Initialize the sum on page load
+        }
+    });
+</script>
 {% endblock %}
