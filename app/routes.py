@@ -79,8 +79,7 @@ def delete_character(character_id):
 @app.route("/choose_origin", methods=["GET", "POST"])
 @login_required
 def choose_origin():
-    form = BackgroundForm()
-    # form = BackgroundForm(origin_id=request.form.get('origin_id', type=int, default=-1))
+    form = BackgroundForm(origin_id=request.form.get('origin_id', type=int, default=-1))
     if form.validate_on_submit():
         new_character = Character(
             name=form.name.data,
@@ -91,9 +90,10 @@ def choose_origin():
         db.session.commit()
 
         selected_traits = form.selectable_traits.data
-        origin_traits = OriginTrait.query.filter(OriginTrait.trait_id.in_(selected_traits)).all()
-        for origin_trait in origin_traits:
-            new_character.traits.append(origin_trait.trait)
+        for trait_id in selected_traits:
+            origin_trait = OriginTrait.query.filter_by(origin_id=form.origin_id.data, trait_id=trait_id).first()
+            if origin_trait:
+                new_character.origin.origin_traits.append(origin_trait)  # Access through the origin relationship
         db.session.commit()
 
         return redirect(url_for("choose_stats", character_id=new_character.id))
@@ -120,8 +120,6 @@ def get_origin_description():
     selectable_traits = [{"id": trait.trait.id, "name": trait.trait.name} for trait in origin.origin_traits if trait.trait.is_selectable]
 
     return jsonify(description=origin.description, selectable_traits=selectable_traits, special_stats=default_stats)
-
-
 
 
 @app.route("/choose_stats/<int:character_id>", methods=["GET", "POST"])
