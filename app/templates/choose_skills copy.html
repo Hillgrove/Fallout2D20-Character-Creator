@@ -17,14 +17,14 @@
                     <h3>Sum</h3>
                 </div>
             </div>
-            {% for skill, skill_form in zip(skills, form.skills) %}
+            {% for skill in skills %}
             <div class="row mb-3">
                 <div class="col-md-4">
                     <label>{{ skill.name }}</label>
-                    {{ skill_form.ranks(class="form-control", type="number", placeholder="Ranks", id="form-skills-" ~ loop.index0 ~ "-ranks", oninput="updateSum(" ~ loop.index0 ~ ")") }}
+                    {{ form.skills[loop.index0].ranks(class="form-control", type="number", placeholder="Ranks", id="form-skills-" ~ loop.index0 ~ "-ranks", oninput="updateSum(" ~ loop.index0 ~ ")") }}
                 </div>
                 <div class="col-md-4 d-flex align-items-center">
-                    {{ skill_form.tagged(class="form-check-input", id="form-skills-" ~ loop.index0 ~ "-tagged", onchange="updateSum(" ~ loop.index0 ~ ")") }}
+                    {{ form.skills[loop.index0].tagged(class="form-check-input", id="form-skills-" ~ loop.index0 ~ "-tagged", onchange="updateSum(" ~ loop.index0 ~ ")") }}
                 </div>
                 <div class="col-md-4 d-flex align-items-center">
                     <span id="sum-{{ loop.index0 }}">0</span>

@@ -82,13 +82,13 @@ class CharacterSkillAttribute(db.Model):
     __tablename__ = "character_skill_attribute"
     character_id = db.Column(db.Integer, db.ForeignKey("character.id"), primary_key=True)
     skill_id = db.Column(db.Integer, db.ForeignKey("skill.id"), primary_key=True)
-    attribute_id = db.Column(db.Integer, db.ForeignKey("attribute.id"), primary_key=True)
+    attribute_id = db.Column(db.Integer, db.ForeignKey("attribute.id"), primary_key=True, nullable=True)  # Allow NULL
     value = db.Column(db.Integer, nullable=False)
     
     # Relationships to Character, Skill, and Attribute
     character = db.relationship("Character", back_populates='character_skill_attributes')
     skill = db.relationship("Skill", back_populates='character_skill_attributes')
-    attribute = db.relationship("Attribute", back_populates='character_skill_attributes')
+    attribute = db.relationship("Attribute", back_populates='character_skill_attributes', foreign_keys=[attribute_id])
 
     __table_args__ = (db.UniqueConstraint('character_id', 'skill_id', 'attribute_id', name='_character_skill_attribute_uc'),)
 

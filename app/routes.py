@@ -2,7 +2,7 @@
 from flask import render_template, redirect, request, url_for, flash, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
 from app import app, db
-from app.forms import RegistrationForm, LoginForm, BackgroundForm, SkillField, StatForm, PerkForm, DeleteForm, SkillForm
+from app.forms import RegistrationForm, LoginForm, BackgroundForm, StatForm, PerkForm, DeleteForm, SkillForm
 from app.models import User, Character, Stat, CharacterStat, Perk, CharacterPerk, Skill, Origin, OriginTrait, CharacterSkillAttribute, Attribute
 from werkzeug.security import generate_password_hash, check_password_hash
 import logging
@@ -172,18 +172,24 @@ def choose_perks(character_id):
     return render_template("choose_perks.html", form=form, character=character, perks=Perk.query.all())
 
 
+
+
+
+
+
 @app.route("/choose_skills/<int:character_id>", methods=["GET", "POST"])
 @login_required
 def choose_skills(character_id):
     character = Character.query.get_or_404(character_id)
     skills = Skill.query.all()
     form = SkillForm()
-    
+
     if request.method == 'GET':
         # Populate the form with a field for each skill with default values
+        form.skills.entries = []
         for skill in skills:
             form.skills.append_entry({'ranks': 0, 'tagged': False})
-    
+
     if form.validate_on_submit():
         # Process form data
         for i, skill_form in enumerate(form.skills.entries):
@@ -198,12 +204,32 @@ def choose_skills(character_id):
                 attribute_id=attribute.id if tagged else None,
                 value=ranks
             )
-            db.session.add(character_skill_attribute)
+            db.session.merge(character_skill_attribute)
         db.session.commit()
         flash("Skills successfully selected", "success")
         return redirect(url_for("character_overview", character_id=character.id))
-    
-    return render_template("choose_skills.html", form=form, character=character, skills=skills)
+    else:
+        if request.method == 'POST':
+            print("Form validation failed")
+            print(request.form)  # Debugging line to print the form data received
+            print("Form Errors:", form.errors)
+            for i, skill_form in enumerate(form.skills.entries):
+                print(f"Skill {i}: ranks={skill_form.ranks.data}, tagged={skill_form.tagged.data}")
+            for fieldName, errorMessages in form.errors.items():
+                for err in errorMessages:
+                    print(f"Field: {fieldName} - Error: {err}")
+
+    return render_template("choose_skills.html", form=form, character=character, skills=skills, zip=zip)
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -99,11 +99,9 @@ class DeleteForm(FlaskForm):
 
 
 class SkillField(FlaskForm):
-    ranks = IntegerField('Ranks', default=0, validators=[DataRequired(), NumberRange(min=0)])
+    ranks = IntegerField('Ranks', validators=[DataRequired(), NumberRange(min=0)])
     tagged = BooleanField('Tagged', default=False)
 
 class SkillForm(FlaskForm):
     skills = FieldList(FormField(SkillField))
     submit = SubmitField('Next')
-
-
