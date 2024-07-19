@@ -75,6 +75,9 @@ document.getElementById('origin_id').addEventListener('change', function() {
         return;
     }
 
+    // Disable the "Select an Origin" option
+    this.options[0].disabled = true;
+
     // Make an AJAX request to fetch the description, selectable traits, and S.P.E.C.I.A.L stats
     fetch('{{ url_for("get_origin_description") }}?origin_id=' + originId)
         .then(response => response.json())
