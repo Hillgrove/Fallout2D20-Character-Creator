@@ -10,103 +10,24 @@
             <label>Total Points Available: <span id="total_points"></span></label>
         </div>
 
-        <!-- Strength -->
-        <div class="form-group">
-            {{ form.strength.label }}
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('strength', -1)">-</button>
-                </div>
-                <input type="number" name="strength" id="strength" class="form-control text-center" value="{{ form.strength.data or 5 }}" min="{{ form.strength.validators[-1].min }}" max="{{ form.strength.validators[-1].max }}" readonly>
-                <div class="input-group-append">
-                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('strength', 1)">+</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Perception -->
-        <div class="form-group">
-            {{ form.perception.label }}
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('perception', -1)">-</button>
-                </div>
-                <input type="number" name="perception" id="perception" class="form-control text-center" value="{{ form.perception.data or 5 }}" min="{{ form.perception.validators[-1].min }}" max="{{ form.perception.validators[-1].max }}" readonly>
-                <div class="input-group-append">
-                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('perception', 1)">+</button>
+        {% for field in form %}
+            {% if field.name != 'csrf_token' and field.type == 'IntegerField' %}
+            <div class="form-group row">
+                <label class="col-sm-1 col-form-label">{{ field.label.text }}</label>
+                <div class="col-sm-2">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <button type="button" class="btn btn-secondary" onclick="changeStatValue('{{ field.name }}', -1)">-</button>
+                        </div>
+                        <input type="number" name="{{ field.name }}" id="{{ field.name }}" class="form-control text-center" value="{{ field.data or 5 }}" min="{{ field.validators[-1].min }}" max="{{ field.validators[-1].max }}" readonly>
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-secondary" onclick="changeStatValue('{{ field.name }}', 1)">+</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Endurance -->
-        <div class="form-group">
-            {{ form.endurance.label }}
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('endurance', -1)">-</button>
-                </div>
-                <input type="number" name="endurance" id="endurance" class="form-control text-center" value="{{ form.endurance.data or 5 }}" min="{{ form.endurance.validators[-1].min }}" max="{{ form.endurance.validators[-1].max }}" readonly>
-                <div class="input-group-append">
-                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('endurance', 1)">+</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Charisma -->
-        <div class="form-group">
-            {{ form.charisma.label }}
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('charisma', -1)">-</button>
-                </div>
-                <input type="number" name="charisma" id="charisma" class="form-control text-center" value="{{ form.charisma.data or 5 }}" min="{{ form.charisma.validators[-1].min }}" max="{{ form.charisma.validators[-1].max }}" readonly>
-                <div class="input-group-append">
-                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('charisma', 1)">+</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Intelligence -->
-        <div class="form-group">
-            {{ form.intelligence.label }}
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('intelligence', -1)">-</button>
-                </div>
-                <input type="number" name="intelligence" id="intelligence" class="form-control text-center" value="{{ form.intelligence.data or 5 }}" min="{{ form.intelligence.validators[-1].min }}" max="{{ form.intelligence.validators[-1].max }}" readonly>
-                <div class="input-group-append">
-                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('intelligence', 1)">+</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Agility -->
-        <div class="form-group">
-            {{ form.agility.label }}
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('agility', -1)">-</button>
-                </div>
-                <input type="number" name="agility" id="agility" class="form-control text-center" value="{{ form.agility.data or 5 }}" min="{{ form.agility.validators[-1].min }}" max="{{ form.agility.validators[-1].max }}" readonly>
-                <div class="input-group-append">
-                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('agility', 1)">+</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Luck -->
-        <div class="form-group">
-            {{ form.luck.label }}
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('luck', -1)">-</button>
-                </div>
-                <input type="number" name="luck" id="luck" class="form-control text-center" value="{{ form.luck.data or 5 }}" min="{{ form.luck.validators[-1].min }}" max="{{ form.luck.validators[-1].max }}" readonly>
-                <div class="input-group-append">
-                    <button type="button" class="btn btn-secondary" onclick="changeStatValue('luck', 1)">+</button>
-                </div>
-            </div>
-        </div>
+            {% endif %}
+        {% endfor %}
 
         <div class="form-group">
             {{ form.submit(class="btn btn-primary") }}
@@ -134,12 +55,14 @@ function changeStatValue(statId, delta) {
 function updateTotalPoints() {
     var totalPoints = {{ character.starting_stat_points }};
     var spentPoints = 0;
-    var statIds = ['strength', 'perception', 'endurance', 'charisma', 'intelligence', 'agility', 'luck'];
+    var statFields = Array.from(document.querySelectorAll('input[type="number"]')).map(input => input.id);
 
     // Calculate spent points as the sum of all stat values
-    statIds.forEach(function(statId) {
-        var input = document.getElementById(statId);
-        spentPoints += parseInt(input.value);
+    statFields.forEach(function(statField) {
+        var input = document.getElementById(statField);
+        if (input) {
+            spentPoints += parseInt(input.value);
+        }
     });
 
     // Update the total points display
@@ -147,15 +70,17 @@ function updateTotalPoints() {
     document.getElementById('total_points').innerText = remainingPoints;
 
     // Disable/enable buttons based on remaining points
-    statIds.forEach(function(statId) {
-        var input = document.getElementById(statId);
-        var value = parseInt(input.value);
+    statFields.forEach(function(statField) {
+        var input = document.getElementById(statField);
+        if (input) {
+            var value = parseInt(input.value);
 
-        // Disable increase button if no points left or value is max
-        document.querySelector(`button[onclick="changeStatValue('${statId}', 1)"]`).disabled = remainingPoints <= 0 || value >= parseInt(input.max);
+            // Disable increase button if no points left or value is max
+            document.querySelector(`button[onclick="changeStatValue('${statField}', 1)"]`).disabled = remainingPoints <= 0 || value >= parseInt(input.max);
 
-        // Disable decrease button if value is min
-        document.querySelector(`button[onclick="changeStatValue('${statId}', -1)"]`).disabled = value <= parseInt(input.min);
+            // Disable decrease button if value is min
+            document.querySelector(`button[onclick="changeStatValue('${statField}', -1)"]`).disabled = value <= parseInt(input.min);
+        }
     });
 }
 
