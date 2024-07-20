@@ -7,56 +7,68 @@
         {{ form.hidden_tag() }}
 
         <!-- Name section -->
-        <div class="form-group">
-            {{ form.name.label(class="form-control-label") }}
-            {{ form.name(class="form-control") }}
-            {% for error in form.name.errors %}
-                <span class="text-danger">{{ error }}</span>
-            {% endfor %}
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.name.label.text }}</label>
+            <div class="col-sm-3">
+                {{ form.name(class="form-control") }}
+                {% for error in form.name.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            </div>
         </div>
 
         <!-- Origin section -->
-        <div class="form-group">
-            {{ form.origin_id.label(class="form-control-label") }}
-            {{ form.origin_id(class="form-control", id="origin_id") }}
-            {% for error in form.origin_id.errors %}
-                <span class="text-danger">{{ error }}</span>
-            {% endfor %}
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">{{ form.origin_id.label.text }}</label>
+            <div class="col-sm-3">
+                {{ form.origin_id(class="form-control", id="origin_id") }}
+                {% for error in form.origin_id.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            </div>
         </div>
 
         <!-- Stat section -->
-        <div class="form-group" id="special_stats_section" style="display: none;">
-            <label class="form-control-label">S.P.E.C.I.A.L Stats</label>
-            <div id="special_stats">
-                <!-- Stats will be dynamically inserted here -->
+        <div class="form-group row" id="special_stats_section" style="display: none;">
+            <label class="col-sm-2 col-form-label">S.P.E.C.I.A.L Stats</label>
+            <div class="col-sm-9">
+                <div id="special_stats">
+                    <!-- Stats will be dynamically inserted here -->
+                </div>
             </div>
         </div>
 
         <!-- Background description section -->
-        <div class="form-group" id="background_description_section" style="display: none;">
-            <label for="origin_description" class="form-control-label">Background Description</label>
-            <p id="origin_description" class="form-control-static"></p>
+        <div class="form-group row" id="background_description_section" style="display: none;">
+            <label for="origin_description" class="col-sm-3 col-form-label">Background Description</label>
+            <div class="col-sm-9">
+                <p id="origin_description" class="form-control-static"></p>
+            </div>
         </div>
 
         <!-- Trait section -->
-        <div class="form-group" id="selectable_traits_section" style="display: none;">
-            {{ form.selectable_traits.label(class="form-control-label") }}
-            <div id="selectable_traits">
-                {% for subfield in form.selectable_traits %}
-                    <div class="form-check">
-                        {{ subfield(class="form-check-input") }}
-                        {{ subfield.label(class="form-check-label") }}
-                    </div>
+        <div class="form-group row" id="selectable_traits_section" style="display: none;">
+            <label class="col-sm-3 col-form-label">{{ form.selectable_traits.label.text }}</label>
+            <div class="col-sm-9">
+                <div id="selectable_traits">
+                    {% for subfield in form.selectable_traits %}
+                        <div class="form-check">
+                            {{ subfield(class="form-check-input") }}
+                            {{ subfield.label(class="form-check-label") }}
+                        </div>
+                    {% endfor %}
+                </div>
+                {% for error in form.selectable_traits.errors %}
+                    <span class="text-danger">{{ error }}</span>
                 {% endfor %}
             </div>
-            {% for error in form.selectable_traits.errors %}
-                <span class="text-danger">{{ error }}</span>
-            {% endfor %}
         </div>
 
         <!-- Next button -->
-        <div class="form-group">
-            {{ form.submit(class="btn btn-primary") }}
+        <div class="form-group row">
+            <div class="col-sm-9">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
         </div>
 
     </form>
@@ -132,14 +144,14 @@ document.getElementById('origin_id').addEventListener('change', function() {
 
             data.special_stats.forEach(function(stat) {
                 var div = document.createElement('div');
-                div.className = 'form-group';
+                div.className = 'form-group row';
 
                 var label = document.createElement('label');
-                label.className = 'form-control-label';
+                label.className = 'col-sm-3 col-form-label';
                 label.innerText = stat.name + ': ';
 
                 var span = document.createElement('span');
-                span.className = 'form-control-static';
+                span.className = 'col-sm-9 form-control-static';
                 span.innerText = ' ' + stat.min + ' - ' + stat.max;
 
                 div.appendChild(label);
