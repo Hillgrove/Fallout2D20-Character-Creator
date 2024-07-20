@@ -25,7 +25,7 @@
         </div>
 
         <!-- Stat section -->
-        <div class="form-group">
+        <div class="form-group" id="special_stats_section" style="display: none;">
             <label class="form-control-label">S.P.E.C.I.A.L Stats</label>
             <div id="special_stats">
                 <!-- Stats will be dynamically inserted here -->
@@ -33,13 +33,13 @@
         </div>
 
         <!-- Background description section -->
-        <div class="form-group">
+        <div class="form-group" id="background_description_section" style="display: none;">
             <label for="origin_description" class="form-control-label">Background Description</label>
             <p id="origin_description" class="form-control-static"></p>
         </div>
 
         <!-- Trait section -->
-        <div class="form-group">
+        <div class="form-group" id="selectable_traits_section" style="display: none;">
             {{ form.selectable_traits.label(class="form-control-label") }}
             <div id="selectable_traits">
                 {% for subfield in form.selectable_traits %}
@@ -67,11 +67,21 @@
 document.getElementById('origin_id').addEventListener('change', function() {
     // Get the selected background ID
     var originId = this.value;
-    
+
+    // Sections to show/hide
+    var specialStatsSection = document.getElementById('special_stats_section');
+    var backgroundDescriptionSection = document.getElementById('background_description_section');
+    var selectableTraitsSection = document.getElementById('selectable_traits_section');
+
     if (originId == -1) {
         document.getElementById('origin_description').innerText = '';
         document.getElementById('selectable_traits').innerHTML = '';
         document.getElementById('special_stats').innerHTML = '';
+
+        specialStatsSection.style.display = 'none';
+        backgroundDescriptionSection.style.display = 'none';
+        selectableTraitsSection.style.display = 'none';
+
         return;
     }
 
@@ -82,6 +92,11 @@ document.getElementById('origin_id').addEventListener('change', function() {
     fetch('{{ url_for("get_origin_description") }}?origin_id=' + originId)
         .then(response => response.json())
         .then(data => {
+            // Show the sections
+            specialStatsSection.style.display = 'block';
+            backgroundDescriptionSection.style.display = 'block';
+            selectableTraitsSection.style.display = 'block';
+
             // Update the description paragraph
             document.getElementById('origin_description').innerText = data.description;
 
