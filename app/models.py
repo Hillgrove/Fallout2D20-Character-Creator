@@ -80,9 +80,10 @@ class Attribute(db.Model):
 
 class CharacterSkillAttribute(db.Model):
     __tablename__ = "character_skill_attribute"
-    character_id = db.Column(db.Integer, db.ForeignKey("character.id"), primary_key=True)
-    skill_id = db.Column(db.Integer, db.ForeignKey("skill.id"), primary_key=True)
-    attribute_id = db.Column(db.Integer, db.ForeignKey("attribute.id"), primary_key=True, nullable=True)  # Allow NULL
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    character_id = db.Column(db.Integer, db.ForeignKey("character.id"), nullable=False)
+    skill_id = db.Column(db.Integer, db.ForeignKey("skill.id"), nullable=False)
+    attribute_id = db.Column(db.Integer, db.ForeignKey("attribute.id"), nullable=True)
     value = db.Column(db.Integer, nullable=False)
     
     # Relationships to Character, Skill, and Attribute
@@ -90,7 +91,8 @@ class CharacterSkillAttribute(db.Model):
     skill = db.relationship("Skill", back_populates='character_skill_attributes')
     attribute = db.relationship("Attribute", back_populates='character_skill_attributes', foreign_keys=[attribute_id])
 
-    __table_args__ = (db.UniqueConstraint('character_id', 'skill_id', 'attribute_id', name='_character_skill_attribute_uc'),)
+    __table_args__ = (db.UniqueConstraint('character_id', 'skill_id', name='_character_skill_uc'),)
+
 
 
 class Origin(db.Model):
