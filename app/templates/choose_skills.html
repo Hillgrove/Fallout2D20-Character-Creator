@@ -13,13 +13,13 @@
                 <div class="col-md-3"><strong>Total</strong></div>
             </div>
             {% for skill in skills %}
-                <div class="row mb-3">
+                <div class="row mb-3 skill-row" data-skill-id="{{ skill.id }}">
                     <div class="col-md-3">{{ skill.name }}</div>
                     <div class="col-md-3">
                         {{ form['skill_' ~ skill.id](class="form-control rank-input") }}
                     </div>
                     <div class="col-md-3">
-                        {{ form['tagged_' ~ skill.id](class="form-check-input") }}
+                        {{ form['tagged_' ~ skill.id](class="form-check-input tagged-checkbox") }}
                     </div>
                     <div class="col-md-3">
                         <span id="total_{{ skill.id }}">{{ form['skill_' ~ skill.id].data or 0 }}</span>
@@ -33,22 +33,27 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const rankInputs = document.querySelectorAll('.rank-input');
-    console.log(`Found ${rankInputs.length} rank inputs.`);
+    const formGroup = document.querySelector('.form-group');
 
-    rankInputs.forEach(input => {
-        console.log(`Adding event listener to input with id: ${input.id}`);
-        input.addEventListener('input', function () {
-            const skillId = this.id.split('_')[1];
-            console.log(`Skill ID from input: ${skillId}`);
-            const totalSpan = document.getElementById('total_' + skillId);
-            if (totalSpan) {
-                console.log(`Updating total span with id: total_${skillId}`);
-                totalSpan.textContent = this.value;
-            } else {
-                console.error(`Total span not found for skill ID: ${skillId}`);
-            }
-        });
+    function updateTotal(skillRow) {
+        const skillId = skillRow.getAttribute('data-skill-id');
+        const rankInput = skillRow.querySelector('.rank-input');
+        const taggedCheckbox = skillRow.querySelector('.tagged-checkbox');
+        const totalSpan = document.getElementById('total_' + skillId);
+        
+        let total = parseInt(rankInput.value) || 0;
+        if (taggedCheckbox.checked) {
+            total += 2;
+        }
+
+        totalSpan.textContent = total;
+    }
+
+    formGroup.addEventListener('input', function (event) {
+        if (event.target.classList.contains('rank-input') || event.target.classList.contains('tagged-checkbox')) {
+            const skillRow = event.target.closest('.skill-row');
+            updateTotal(skillRow);
+        }
     });
 });
 </script>
