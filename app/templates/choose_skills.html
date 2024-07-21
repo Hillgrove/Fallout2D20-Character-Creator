@@ -5,6 +5,7 @@
     <h1 class="mt-5">Choose Your Skills</h1>
     <form method="POST" action="{{ url_for('choose_skills', character_id=character_id) }}">
         {{ form.hidden_tag() }}
+
         <div class="form-group">
             <div class="row mb-3">
                 <div class="col-md-3"><strong>Skill</strong></div>
@@ -13,14 +14,33 @@
                 <div class="col-md-3"><strong>Total</strong></div>
             </div>
             {% for skill in skills %}
+                
+                <!-- Row -->
                 <div class="row mb-3 skill-row" data-skill-id="{{ skill.id }}">
+                    
+                    <!-- Skill name -->
                     <div class="col-md-3">{{ skill.name }}</div>
+
+                    <!-- Rank value -->
                     <div class="col-md-3">
-                        {{ form['skill_' ~ skill.id](class="form-control rank-input") }}
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <button type="button" class="btn btn-secondary" onclick="changeStatValue('{{ form['skill_' ~ skill.id].id }}', -1)">-</button>
+                            </div>
+                            <input type="number" name="{{ form['skill_' ~ skill.id].name }}" id="{{ form['skill_' ~ skill.id].id }}" class="form-control text-center rank-input" value="{{ form['skill_' ~ skill.id].data or 0 }}" min="{{ form['skill_' ~ skill.id].validators[-1].min }}" max="{{ form['skill_' ~ skill.id].validators[-1].max }}" readonly>
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-secondary" onclick="changeStatValue('{{ form['skill_' ~ skill.id].id }}', 1)">+</button>
+                            </div>
+                        </div>
                     </div>
+
+                    
+                    <!-- Tagged -->
                     <div class="col-md-3">
                         {{ form['tagged_' ~ skill.id](class="form-check-input tagged-checkbox") }}
                     </div>
+
+                    <!-- Total Sum -->
                     <div class="col-md-3">
                         <span id="total_{{ skill.id }}">{{ form['skill_' ~ skill.id].data or 0 }}</span>
                     </div>
@@ -56,5 +76,25 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
+function changeStatValue(inputId, delta) {
+    const input = document.getElementById(inputId);
+    let currentValue = parseInt(input.value) || 0;
+    let minValue = parseInt(input.min) || 0;
+    let maxValue = parseInt(input.max) || 100; // Use a default max value if not set
+
+    // Update the value based on delta and ensure it stays within bounds
+    currentValue += delta;
+    if (currentValue < minValue) currentValue = minValue;
+    if (currentValue > maxValue) currentValue = maxValue;
+
+    input.value = currentValue;
+
+    // Trigger input event to update the total
+    const skillRow = input.closest('.skill-row');
+    if (skillRow) {
+        updateTotal(skillRow);
+    }
+}
 </script>
 {% endblock %}
