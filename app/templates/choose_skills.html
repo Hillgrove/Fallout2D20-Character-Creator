@@ -3,19 +3,53 @@
 {% block content %}
 <div class="container">
     <h1 class="mt-5">Choose Your Skills</h1>
-    <form method="POST" action="{{ url_for('choose_skills') }}">
+    <form method="POST" action="{{ url_for('choose_skills', character_id=character_id) }}">
         {{ form.hidden_tag() }}
+        <div class="form-group">
+            <div class="row mb-3">
+                <div class="col-md-3"><strong>Skill</strong></div>
+                <div class="col-md-3"><strong>Rank</strong></div>
+                <div class="col-md-3"><strong>Tagged</strong></div>
+                <div class="col-md-3"><strong>Total</strong></div>
+            </div>
             {% for skill in skills %}
-                {% set field_name = 'skill_' + skill.id|string %}
-                <label for="{{ field_name }}">{{ skill.name }}</label>
-                {{ form[field_name](class="form-control", value=0) }}
+                <div class="row mb-3">
+                    <div class="col-md-3">{{ skill.name }}</div>
+                    <div class="col-md-3">
+                        {{ form['skill_' ~ skill.id](class="form-control rank-input") }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ form['tagged_' ~ skill.id](class="form-check-input") }}
+                    </div>
+                    <div class="col-md-3">
+                        <span id="total_{{ skill.id }}">{{ form['skill_' ~ skill.id].data or 0 }}</span>
+                    </div>
+                </div>
             {% endfor %}
-
-
-
-
         </div>
-        {{ form.submit(class="btn btn-primary") }}
+        <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const rankInputs = document.querySelectorAll('.rank-input');
+    console.log(`Found ${rankInputs.length} rank inputs.`);
+
+    rankInputs.forEach(input => {
+        console.log(`Adding event listener to input with id: ${input.id}`);
+        input.addEventListener('input', function () {
+            const skillId = this.id.split('_')[1];
+            console.log(`Skill ID from input: ${skillId}`);
+            const totalSpan = document.getElementById('total_' + skillId);
+            if (totalSpan) {
+                console.log(`Updating total span with id: total_${skillId}`);
+                totalSpan.textContent = this.value;
+            } else {
+                console.error(`Total span not found for skill ID: ${skillId}`);
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

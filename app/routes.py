@@ -180,31 +180,62 @@ def choose_perks(character_id):
 
 
 
-@app.route('/choose_skills', methods=['GET', 'POST'])
-def choose_skills():
+@app.route('/choose_skills/<int:character_id>', methods=['GET', 'POST'])
+def choose_skills(character_id):
     skills = Skill.query.all()
+    tagged_attribute = Attribute.query.filter_by(name='Tagged').first()
     SkillForm = DynamicSkillForm(skills)
+
+    # Retrieve existing values from the database
+    existing_values = {
+        skill.id: CharacterSkillAttribute.query.filter_by(character_id=character_id, skill_id=skill.id).first()
+        for skill in skills
+    }
+
     form = SkillForm()
 
-    if form.validate_on_submit():
-        character_id = 1  # Replace with the actual character ID from the session or context
+    # Pre-populate form with existing values
+    if request.method == 'GET':
         for skill in skills:
-            field_name = f'skill_{skill.id}'
-            field = getattr(form, field_name)
-            value = field.data if field.data is not None else 0
+            skill_field_name = f'skill_{skill.id}'
+            tagged_field_name = f'tagged_{skill.id}'
+            existing_value = existing_values[skill.id]
+            if existing_value:
+                form[skill_field_name].data = existing_value.value
+                form[tagged_field_name].data = existing_value.attribute_id == tagged_attribute.id
+
+    if form.validate_on_submit():
+        for skill in skills:
+            skill_field_name = f'skill_{skill.id}'
+            tagged_field_name = f'tagged_{skill.id}'
+            skill_value = getattr(form, skill_field_name).data or 0  # Default to 0 if empty
+            is_tagged = getattr(form, tagged_field_name).data
+
             character_skill_attr = CharacterSkillAttribute.query.filter_by(character_id=character_id, skill_id=skill.id).first()
             if character_skill_attr:
-                character_skill_attr.value += value
+                character_skill_attr.value += skill_value
+                if is_tagged:
+                    character_skill_attr.attribute_id = tagged_attribute.id
+                else:
+                    if character_skill_attr.attribute_id == tagged_attribute.id:
+                        character_skill_attr.attribute_id = None
             else:
-                new_skill_attr = CharacterSkillAttribute(character_id=character_id, skill_id=skill.id, value=value)
+                new_skill_attr = CharacterSkillAttribute(character_id=character_id, skill_id=skill.id, value=skill_value)
+                if is_tagged:
+                    new_skill_attr.attribute_id = tagged_attribute.id
                 db.session.add(new_skill_attr)
         db.session.commit()
         return redirect(url_for('character_overview', character_id=character_id))  # Ensure character_id is passed
-    else:
-        print("Form not valid or not submitted")
-        print(form.errors)
-    
-    return render_template('choose_skills.html', form=form, skills=skills)
+
+    return render_template('choose_skills.html', form=form, skills=skills, character_id=character_id)
+
+
+
+
+
+
+
+
 
 
 

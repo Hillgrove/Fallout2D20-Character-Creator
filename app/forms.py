@@ -98,26 +98,14 @@ class DeleteForm(FlaskForm):
     pass
 
 
-# class SkillField(FlaskForm):
-#     ranks = IntegerField('Ranks', validators=[DataRequired(), NumberRange(min=0)])
-#     tagged = BooleanField('Tagged', default=False)
-
-# class SkillForm(FlaskForm):
-#     skills = FieldList(FormField(SkillField))
-#     submit = SubmitField('Next')
-
-
 def DynamicSkillForm(skills):
     class SkillForm(FlaskForm):
         submit = SubmitField('Submit')
     for skill in skills:
         field_name = f'skill_{skill.id}'
-        field = IntegerField(skill.name, validators=[NumberRange(min=0)], default=0)
-        setattr(SkillForm, field_name, field)
+        skill_field = IntegerField(skill.name, validators=[NumberRange(min=0)], default=0)
+        tagged_field = BooleanField(f'Tagged {skill.name}')
+        setattr(SkillForm, field_name, skill_field)
+        setattr(SkillForm, f'tagged_{skill.id}', tagged_field)
     return SkillForm
-
-
-
-
-
 
