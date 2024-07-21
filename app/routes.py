@@ -2,7 +2,7 @@
 from flask import render_template, redirect, request, url_for, flash, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
 from app import app, db
-from app.forms import RegistrationForm, LoginForm, BackgroundForm, StatForm, PerkForm, DeleteForm, SkillForm
+from app.forms import RegistrationForm, LoginForm, BackgroundForm, StatForm, PerkForm, DeleteForm, DynamicSkillForm
 from app.models import User, Character, Stat, CharacterStat, Perk, CharacterPerk, Skill, Origin, OriginTrait, CharacterSkillAttribute, Attribute
 from werkzeug.security import generate_password_hash, check_password_hash
 import logging
@@ -67,12 +67,19 @@ def dashboard():
 @login_required
 def delete_character(character_id):
     character = Character.query.get_or_404(character_id)
+    # Check if the current user owns the character
     if character.user_id != current_user.id:
         flash("You do not have permission to delete this character", "danger")
         return redirect(url_for("dashboard"))
+    
+    # Perform the delete operation
     db.session.delete(character)
-    db.session.commit()
-    flash("Character successfully deleted", "success")
+    try:
+        db.session.commit()
+        flash("Character successfully deleted", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"An error occurred while deleting the character: {str(e)}", "danger")
     return redirect(url_for("dashboard"))
 
 
@@ -173,53 +180,59 @@ def choose_perks(character_id):
 
 
 
-
-
-
-
-@app.route("/choose_skills/<int:character_id>", methods=["GET", "POST"])
-@login_required
+@app.route('/choose_skills/<int:character_id>', methods=['GET', 'POST'])
 def choose_skills(character_id):
-    character = Character.query.get_or_404(character_id)
     skills = Skill.query.all()
+    tagged_attribute = Attribute.query.filter_by(name='Tagged').first()
+    SkillForm = DynamicSkillForm(skills)
+
+    # Retrieve existing values from the database
+    existing_values = {
+        skill.id: CharacterSkillAttribute.query.filter_by(character_id=character_id, skill_id=skill.id).first()
+        for skill in skills
+    }
+
     form = SkillForm()
 
+    # Pre-populate form with existing values
     if request.method == 'GET':
-        # Populate the form with a field for each skill with default values
-        form.skills.entries = []
         for skill in skills:
-            form.skills.append_entry({'ranks': 0, 'tagged': False})
+            skill_field_name = f'skill_{skill.id}'
+            tagged_field_name = f'tagged_{skill.id}'
+            existing_value = existing_values[skill.id]
+            if existing_value:
+                form[skill_field_name].data = existing_value.value
+                form[tagged_field_name].data = existing_value.attribute_id == tagged_attribute.id
 
     if form.validate_on_submit():
-        # Process form data
-        for i, skill_form in enumerate(form.skills.entries):
-            skill = skills[i]
-            ranks = skill_form.ranks.data
-            tagged = skill_form.tagged.data
-            attribute = Attribute.query.filter_by(name='Tagged').first()
-            
-            character_skill_attribute = CharacterSkillAttribute(
-                character_id=character.id,
-                skill_id=skill.id,
-                attribute_id=attribute.id if tagged else None,
-                value=ranks
-            )
-            db.session.merge(character_skill_attribute)
-        db.session.commit()
-        flash("Skills successfully selected", "success")
-        return redirect(url_for("character_overview", character_id=character.id))
-    else:
-        if request.method == 'POST':
-            print("Form validation failed")
-            print(request.form)  # Debugging line to print the form data received
-            print("Form Errors:", form.errors)
-            for i, skill_form in enumerate(form.skills.entries):
-                print(f"Skill {i}: ranks={skill_form.ranks.data}, tagged={skill_form.tagged.data}")
-            for fieldName, errorMessages in form.errors.items():
-                for err in errorMessages:
-                    print(f"Field: {fieldName} - Error: {err}")
+        for skill in skills:
+            skill_field_name = f'skill_{skill.id}'
+            tagged_field_name = f'tagged_{skill.id}'
+            skill_value = getattr(form, skill_field_name).data or 0  # Default to 0 if empty
+            is_tagged = getattr(form, tagged_field_name).data
 
-    return render_template("choose_skills.html", form=form, character=character, skills=skills, zip=zip)
+            character_skill_attr = CharacterSkillAttribute.query.filter_by(character_id=character_id, skill_id=skill.id).first()
+            if character_skill_attr:
+                character_skill_attr.value += skill_value
+                if is_tagged:
+                    character_skill_attr.attribute_id = tagged_attribute.id
+                else:
+                    if character_skill_attr.attribute_id == tagged_attribute.id:
+                        character_skill_attr.attribute_id = None
+            else:
+                new_skill_attr = CharacterSkillAttribute(character_id=character_id, skill_id=skill.id, value=skill_value)
+                if is_tagged:
+                    new_skill_attr.attribute_id = tagged_attribute.id
+                db.session.add(new_skill_attr)
+        db.session.commit()
+        return redirect(url_for('character_overview', character_id=character_id))  # Ensure character_id is passed
+
+    return render_template('choose_skills.html', form=form, skills=skills, character_id=character_id)
+
+
+
+
+
 
 
 

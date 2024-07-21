@@ -30,9 +30,9 @@
 
         <!-- Stat section -->
         <div class="form-group row" id="special_stats_section" style="display: none;">
-            <label class="col-sm-2 col-form-label">S.P.E.C.I.A.L Stats</label>
+            <label class="col-sm-4 col-form-label">S.P.E.C.I.A.L Stats</label>
             <div class="col-sm-9">
-                <div id="special_stats">
+                <div id="special_stats" class="row">
                     <!-- Stats will be dynamically inserted here -->
                 </div>
             </div>
@@ -144,14 +144,15 @@ document.getElementById('origin_id').addEventListener('change', function() {
 
             data.special_stats.forEach(function(stat) {
                 var div = document.createElement('div');
-                div.className = 'form-group row';
+                div.className = 'col-sm-12 d-flex align-items-center'; // Bootstrap class for full-width column and centering
 
                 var label = document.createElement('label');
-                label.className = 'col-sm-3 col-form-label';
+                label.className = 'col-sm-2 mb-0'; // Removed col-form-label and added mb-0 for no margin-bottom
+                label.style.padding = '0'; // Remove padding
                 label.innerText = stat.name + ': ';
 
                 var span = document.createElement('span');
-                span.className = 'col-sm-9 form-control-static';
+                span.className = 'col-sm-2 form-control-static';
                 span.innerText = ' ' + stat.min + ' - ' + stat.max;
 
                 div.appendChild(label);

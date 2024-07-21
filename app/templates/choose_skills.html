@@ -2,71 +2,99 @@
 
 {% block content %}
 <div class="container">
-    <h1>Choose Skills for {{ character.name }}</h1>
-    <form method="POST" action="{{ url_for('choose_skills', character_id=character.id) }}">
+    <h1 class="mt-5">Choose Your Skills</h1>
+    <form method="POST" action="{{ url_for('choose_skills', character_id=character_id) }}">
         {{ form.hidden_tag() }}
+
         <div class="form-group">
             <div class="row mb-3">
-                <div class="col-md-4">
-                    <h3>Skill</h3>
-                </div>
-                <div class="col-md-4">
-                    <h3>Tag</h3>
-                </div>
-                <div class="col-md-4">
-                    <h3>Sum</h3>
-                </div>
+                <div class="col-md-3"><strong>Skill</strong></div>
+                <div class="col-md-3"><strong>Rank</strong></div>
+                <div class="col-md-3"><strong>Tagged</strong></div>
+                <div class="col-md-3"><strong>Total</strong></div>
             </div>
-            {% for skill, skill_form in zip(skills, form.skills) %}
-            <div class="row mb-3">
-                <div class="col-md-4">
-                    <label>{{ skill.name }}</label>
-                    {{ skill_form.ranks(class="form-control", type="number", placeholder="Ranks", id="form-skills-" ~ loop.index0 ~ "-ranks", oninput="updateSum(" ~ loop.index0 ~ ")") }}
+            {% for skill in skills %}
+                
+                <!-- Row -->
+                <div class="row mb-3 skill-row" data-skill-id="{{ skill.id }}">
+                    
+                    <!-- Skill name -->
+                    <div class="col-md-3">{{ skill.name }}</div>
+
+                    <!-- Rank value -->
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <button type="button" class="btn btn-secondary" onclick="changeStatValue('{{ form['skill_' ~ skill.id].id }}', -1)">-</button>
+                            </div>
+                            <input type="number" name="{{ form['skill_' ~ skill.id].name }}" id="{{ form['skill_' ~ skill.id].id }}" class="form-control text-center rank-input" value="{{ form['skill_' ~ skill.id].data or 0 }}" min="{{ form['skill_' ~ skill.id].validators[-1].min }}" max="{{ form['skill_' ~ skill.id].validators[-1].max }}" readonly>
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-secondary" onclick="changeStatValue('{{ form['skill_' ~ skill.id].id }}', 1)">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <!-- Tagged -->
+                    <div class="col-md-3">
+                        {{ form['tagged_' ~ skill.id](class="form-check-input tagged-checkbox") }}
+                    </div>
+
+                    <!-- Total Sum -->
+                    <div class="col-md-3">
+                        <span id="total_{{ skill.id }}">{{ form['skill_' ~ skill.id].data or 0 }}</span>
+                    </div>
                 </div>
-                <div class="col-md-4 d-flex align-items-center">
-                    {{ skill_form.tagged(class="form-check-input", id="form-skills-" ~ loop.index0 ~ "-tagged", onchange="updateSum(" ~ loop.index0 ~ ")") }}
-                </div>
-                <div class="col-md-4 d-flex align-items-center">
-                    <span id="sum-{{ loop.index0 }}">0</span>
-                </div>
-            </div>
             {% endfor %}
         </div>
-        <div class="form-group">
-            {{ form.submit(class="btn btn-primary") }}
-        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
 
 <script>
-    function updateSum(index) {
-        const ranksInput = document.getElementById('form-skills-' + index + '-ranks');
-        const taggedCheckbox = document.getElementById('form-skills-' + index + '-tagged');
-        const sumSpan = document.getElementById('sum-' + index);
+document.addEventListener('DOMContentLoaded', function () {
+    const formGroup = document.querySelector('.form-group');
 
-        if (!ranksInput || !taggedCheckbox || !sumSpan) {
-            console.error('Elements not found for index ' + index);
-            return;
-        }
-
-        let sum = parseInt(ranksInput.value) || 0;
-
+    function updateTotal(skillRow) {
+        const skillId = skillRow.getAttribute('data-skill-id');
+        const rankInput = skillRow.querySelector('.rank-input');
+        const taggedCheckbox = skillRow.querySelector('.tagged-checkbox');
+        const totalSpan = document.getElementById('total_' + skillId);
+        
+        let total = parseInt(rankInput.value) || 0;
         if (taggedCheckbox.checked) {
-            sum += 2;
+            total += 2;
         }
 
-        sumSpan.textContent = sum;
+        totalSpan.textContent = total;
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const checkboxes = document.querySelectorAll('.form-check-input');
-        const rankInputs = document.querySelectorAll('.form-control[type="number"]');
-
-        for (let i = 0; i < checkboxes.length; i++) {
-            checkboxes[i].addEventListener('change', function() { updateSum(i); });
-            rankInputs[i].addEventListener('input', function() { updateSum(i); });
-            updateSum(i); // Initialize the sum on page load
+    formGroup.addEventListener('input', function (event) {
+        if (event.target.classList.contains('rank-input') || event.target.classList.contains('tagged-checkbox')) {
+            const skillRow = event.target.closest('.skill-row');
+            updateTotal(skillRow);
         }
     });
+});
+
+function changeStatValue(inputId, delta) {
+    const input = document.getElementById(inputId);
+    let currentValue = parseInt(input.value) || 0;
+    let minValue = parseInt(input.min) || 0;
+    let maxValue = parseInt(input.max) || 100; // Use a default max value if not set
+
+    // Update the value based on delta and ensure it stays within bounds
+    currentValue += delta;
+    if (currentValue < minValue) currentValue = minValue;
+    if (currentValue > maxValue) currentValue = maxValue;
+
+    input.value = currentValue;
+
+    // Trigger input event to update the total
+    const skillRow = input.closest('.skill-row');
+    if (skillRow) {
+        updateTotal(skillRow);
+    }
+}
 </script>
 {% endblock %}
