@@ -2,71 +2,30 @@
 
 {% block content %}
 <div class="container">
-    <h1>Choose Skills for {{ character.name }}</h1>
-    <form method="POST" action="{{ url_for('choose_skills', character_id=character.id) }}">
+    <h1 class="mt-5">Choose Your Skills</h1>
+    <form method="POST" action="{{ url_for('choose_skills') }}">
         {{ form.hidden_tag() }}
         <div class="form-group">
-            <div class="row mb-3">
-                <div class="col-md-4">
-                    <h3>Skill</h3>
-                </div>
-                <div class="col-md-4">
-                    <h3>Tag</h3>
-                </div>
-                <div class="col-md-4">
-                    <h3>Sum</h3>
-                </div>
-            </div>
             {% for skill in skills %}
-            <div class="row mb-3">
-                <div class="col-md-4">
-                    <label>{{ skill.name }}</label>
-                    {{ form.skills[loop.index0].ranks(class="form-control", type="number", placeholder="Ranks", id="form-skills-" ~ loop.index0 ~ "-ranks", oninput="updateSum(" ~ loop.index0 ~ ")") }}
+                {% set field_name = 'skill_' + skill.id|string %}
+                {% set tagged_name = 'tagged_' + skill.id|string %}
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <label for="{{ field_name }}">{{ skill.name }}</label>
+                    </div>
+                    <div class="col-md-3">
+                        {{ form[field_name](class="form-control") }}
+                    </div>
+                    <div class="col-md-3 d-flex align-items-center">
+                        {{ form[tagged_name](class="form-check-input ms-2") }}
+                    </div>
+                    <div class="col-md-3 d-flex align-items-center">
+                        <span id="sum_{{ skill.id }}">0</span>
+                    </div>
                 </div>
-                <div class="col-md-4 d-flex align-items-center">
-                    {{ form.skills[loop.index0].tagged(class="form-check-input", id="form-skills-" ~ loop.index0 ~ "-tagged", onchange="updateSum(" ~ loop.index0 ~ ")") }}
-                </div>
-                <div class="col-md-4 d-flex align-items-center">
-                    <span id="sum-{{ loop.index0 }}">0</span>
-                </div>
-            </div>
             {% endfor %}
         </div>
-        <div class="form-group">
-            {{ form.submit(class="btn btn-primary") }}
-        </div>
+        {{ form.submit(class="btn btn-primary") }}
     </form>
 </div>
-
-<script>
-    function updateSum(index) {
-        const ranksInput = document.getElementById('form-skills-' + index + '-ranks');
-        const taggedCheckbox = document.getElementById('form-skills-' + index + '-tagged');
-        const sumSpan = document.getElementById('sum-' + index);
-
-        if (!ranksInput || !taggedCheckbox || !sumSpan) {
-            console.error('Elements not found for index ' + index);
-            return;
-        }
-
-        let sum = parseInt(ranksInput.value) || 0;
-
-        if (taggedCheckbox.checked) {
-            sum += 2;
-        }
-
-        sumSpan.textContent = sum;
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const checkboxes = document.querySelectorAll('.form-check-input');
-        const rankInputs = document.querySelectorAll('.form-control[type="number"]');
-
-        for (let i = 0; i < checkboxes.length; i++) {
-            checkboxes[i].addEventListener('change', function() { updateSum(i); });
-            rankInputs[i].addEventListener('input', function() { updateSum(i); });
-            updateSum(i); // Initialize the sum on page load
-        }
-    });
-</script>
 {% endblock %}
