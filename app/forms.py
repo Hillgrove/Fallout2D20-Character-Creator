@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import  BooleanField, FieldList, FormField, IntegerField, PasswordField, SelectField, SelectMultipleField, StringField, SubmitField, widgets
+from wtforms import  BooleanField, IntegerField, PasswordField, SelectField, SelectMultipleField, StringField, SubmitField, widgets
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError, NumberRange
-from app.models import User, Origin, Perk, Skill
+from app.models import User, Origin, Perk
 
 
 class RegistrationForm(FlaskForm):
@@ -46,7 +46,6 @@ class BackgroundForm(FlaskForm):
     def validate_selectable_traits(self, field):
         if self.origin and len(field.data) > self.origin.selectable_traits_limit:
             raise ValidationError(f'You can select up to {self.origin.selectable_traits_limit} traits only.')
-
 
 
 class StatForm(FlaskForm):

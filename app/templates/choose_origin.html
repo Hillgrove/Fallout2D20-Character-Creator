@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container">
     <h1>Create Character</h1>
-    <form method="POST" action="{{ url_for('choose_origin') }}">
+    <form id="create-character-form" method="POST" action="{{ url_for('choose_origin') }}">
         {{ form.hidden_tag() }}
 
         <!-- Name section -->
@@ -46,7 +46,17 @@
             </div>
         </div>
 
-        <!-- Trait section -->
+        <!-- Non-Selectable Trait section -->
+        <div class="form-group row" id="non_selectable_traits_section" style="display: none;">
+            <label class="col-sm-3 col-form-label">Non-Selectable Traits</label>
+            <div class="col-sm-9">
+                <ul id="non_selectable_traits">
+                    <!-- Non-selectable traits will be dynamically inserted here -->
+                </ul>
+            </div>
+        </div>
+
+        <!-- Selectable Trait section -->
         <div class="form-group row" id="selectable_traits_section" style="display: none;">
             <label class="col-sm-3 col-form-label">{{ form.selectable_traits.label.text }}</label>
             <div class="col-sm-9">
@@ -58,9 +68,6 @@
                         </div>
                     {% endfor %}
                 </div>
-                {% for error in form.selectable_traits.errors %}
-                    <span class="text-danger">{{ error }}</span>
-                {% endfor %}
             </div>
         </div>
 
@@ -84,15 +91,19 @@ document.getElementById('origin_id').addEventListener('change', function() {
     var specialStatsSection = document.getElementById('special_stats_section');
     var backgroundDescriptionSection = document.getElementById('background_description_section');
     var selectableTraitsSection = document.getElementById('selectable_traits_section');
+    var nonSelectableTraitsSection = document.getElementById('non_selectable_traits_section');
+    var form = document.getElementById('create-character-form');
 
     if (originId == -1) {
         document.getElementById('origin_description').innerText = '';
         document.getElementById('selectable_traits').innerHTML = '';
         document.getElementById('special_stats').innerHTML = '';
+        document.getElementById('non_selectable_traits').innerHTML = '';
 
         specialStatsSection.style.display = 'none';
         backgroundDescriptionSection.style.display = 'none';
         selectableTraitsSection.style.display = 'none';
+        nonSelectableTraitsSection.style.display = 'none';
 
         return;
     }
@@ -107,7 +118,8 @@ document.getElementById('origin_id').addEventListener('change', function() {
             // Show the sections
             specialStatsSection.style.display = 'block';
             backgroundDescriptionSection.style.display = 'block';
-            selectableTraitsSection.style.display = 'block';
+            selectableTraitsSection.style.display = data.selectable_traits.length > 0 ? 'block' : 'none';
+            nonSelectableTraitsSection.style.display = data.non_selectable_traits.length > 0 ? 'block' : 'none';
 
             // Update the description paragraph
             document.getElementById('origin_description').innerText = data.description;
@@ -138,6 +150,16 @@ document.getElementById('origin_id').addEventListener('change', function() {
                 traitsDiv.appendChild(div);
             });
 
+            // Update the non-selectable traits
+            var nonSelectableTraitsDiv = document.getElementById('non_selectable_traits');
+            nonSelectableTraitsDiv.innerHTML = ''; // Clear previous traits
+
+            data.non_selectable_traits.forEach(function(trait) {
+                var li = document.createElement('li');
+                li.innerHTML = '<strong>' + trait.name + ':</strong> ' + trait.description;
+                nonSelectableTraitsDiv.appendChild(li);
+            });
+
             // Update the S.P.E.C.I.A.L stats
             var statsDiv = document.getElementById('special_stats');
             statsDiv.innerHTML = ''; // Clear previous stats
@@ -160,6 +182,9 @@ document.getElementById('origin_id').addEventListener('change', function() {
 
                 statsDiv.appendChild(div);
             });
+
+            // Update the selectable traits limit in the form data
+            form.setAttribute('data-trait-limit', data.selectable_traits_limit);
         });
 });
 </script>

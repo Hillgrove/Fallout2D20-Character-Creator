@@ -124,8 +124,9 @@ def get_origin_description():
                     stat["min"] = trait.trait.trait_data.get("min", stat["min"])
 
     selectable_traits = [{"id": trait.trait.id, "name": trait.trait.name} for trait in origin.origin_traits if trait.trait.is_selectable]
+    non_selectable_traits = [{"id": trait.trait.id, "name": trait.trait.name, "description": trait.trait.description} for trait in origin.origin_traits if not trait.trait.is_selectable]
 
-    return jsonify(description=origin.description, selectable_traits=selectable_traits, special_stats=default_stats)
+    return jsonify(description=origin.description, selectable_traits=selectable_traits, non_selectable_traits=non_selectable_traits, special_stats=default_stats)
 
 
 @app.route("/choose_stats/<int:character_id>", methods=["GET", "POST"])
