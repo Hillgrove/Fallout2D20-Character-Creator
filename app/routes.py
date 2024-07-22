@@ -116,17 +116,26 @@ def get_origin_description():
     default_stats = [{"name": stat.name, "min": 4, "max": 10} for stat in Stat.query.all()]
 
     # Adjust stats based on origin traits
-    for trait in origin.origin_traits:
-        if "stat" in trait.trait.trait_data:
+    for origin_trait in origin.origin_traits:
+        trait = origin_trait.trait
+        if "stat" in trait.trait_data:
             for stat in default_stats:
-                if stat["name"] == trait.trait.trait_data["stat"]:
-                    stat["max"] = trait.trait.trait_data.get("max", stat["max"])
-                    stat["min"] = trait.trait.trait_data.get("min", stat["min"])
+                if stat["name"] == trait.trait_data["stat"]:
+                    stat["max"] = trait.trait_data.get("max", stat["max"])
+                    stat["min"] = trait.trait_data.get("min", stat["min"])
 
     selectable_traits = [{"id": trait.trait.id, "name": trait.trait.name} for trait in origin.origin_traits if trait.trait.is_selectable]
     non_selectable_traits = [{"id": trait.trait.id, "name": trait.trait.name, "description": trait.trait.description} for trait in origin.origin_traits if not trait.trait.is_selectable]
 
-    return jsonify(description=origin.description, selectable_traits=selectable_traits, non_selectable_traits=non_selectable_traits, special_stats=default_stats)
+    return jsonify(
+        description=origin.description, 
+        selectable_traits=selectable_traits, 
+        non_selectable_traits=non_selectable_traits, 
+        special_stats=default_stats,
+        selectable_traits_limit=origin.selectable_traits_limit  # Ensure this is included
+    )
+
+
 
 
 @app.route("/choose_stats/<int:character_id>", methods=["GET", "POST"])
