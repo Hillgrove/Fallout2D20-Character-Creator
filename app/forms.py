@@ -48,6 +48,7 @@ class BackgroundForm(FlaskForm):
             raise ValidationError(f'You can select up to {self.origin.selectable_traits_limit} traits only.')
 
 
+
 class StatForm(FlaskForm):
     strength = IntegerField('Strength', validators=[DataRequired(), NumberRange(min=1, max=10)])
     perception = IntegerField('Perception', validators=[DataRequired(), NumberRange(min=1, max=10)])

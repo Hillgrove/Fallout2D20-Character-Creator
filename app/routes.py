@@ -3,7 +3,7 @@ from flask import render_template, redirect, request, url_for, flash, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
 from app import app, db
 from app.forms import RegistrationForm, LoginForm, BackgroundForm, StatForm, PerkForm, DeleteForm, DynamicSkillForm
-from app.models import User, Character, Stat, CharacterStat, Perk, CharacterPerk, Skill, Origin, OriginTrait, CharacterSkillAttribute, Attribute
+from app.models import User, Character, Stat, CharacterStat, Perk, CharacterPerk, Skill, Origin, OriginTrait, CharacterSkillAttribute, Attribute, Trait, CharacterTrait
 from werkzeug.security import generate_password_hash, check_password_hash
 import logging
 
@@ -98,9 +98,8 @@ def choose_origin():
 
         selected_traits = form.selectable_traits.data
         for trait_id in selected_traits:
-            origin_trait = OriginTrait.query.filter_by(origin_id=form.origin_id.data, trait_id=trait_id).first()
-            if origin_trait:
-                new_character.origin.origin_traits.append(origin_trait)  # Access through the origin relationship
+            new_trait = CharacterTrait(character_id=new_character.id, trait_id=trait_id)
+            db.session.add(new_trait)
         db.session.commit()
 
         return redirect(url_for("choose_stats", character_id=new_character.id))
@@ -179,7 +178,6 @@ def choose_perks(character_id):
     return render_template("choose_perks.html", form=form, character=character, perks=Perk.query.all())
 
 
-
 @app.route('/choose_skills/<int:character_id>', methods=['GET', 'POST'])
 def choose_skills(character_id):
     skills = Skill.query.all()
@@ -230,22 +228,6 @@ def choose_skills(character_id):
     return render_template('choose_skills.html', form=form, skills=skills, character_id=character_id)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @app.route("/character_overview/<int:character_id>")
 @login_required
 def character_overview(character_id):
@@ -254,5 +236,15 @@ def character_overview(character_id):
     character_stats = CharacterStat.query.filter_by(character_id=character.id).all()
     character_skill_attributes = CharacterSkillAttribute.query.filter_by(character_id=character.id).all()
     character_perks = CharacterPerk.query.filter_by(character_id=character.id).all()
+    
+    # Fetching only selected traits
+    character_traits = CharacterTrait.query.filter_by(character_id=character.id).all()
 
-    return render_template("character_overview.html", character=character, character_stats=character_stats, character_skill_attributes=character_skill_attributes, character_perks=character_perks)
+    return render_template("character_overview.html", 
+                           character=character, 
+                           character_stats=character_stats, 
+                           character_skill_attributes=character_skill_attributes, 
+                           character_perks=character_perks, 
+                           character_traits=character_traits)
+
+

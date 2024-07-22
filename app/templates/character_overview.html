@@ -10,16 +10,47 @@
     <p><strong>Current XP:</strong> {{ character.current_xp }}</p>
     
     <h2>S.P.E.C.I.A.L Stats</h2>
-    <ul>
-        {% for stat in character_stats %}
-        <li><strong>{{ stat.stat.name }}:</strong> {{ stat.value }}</li>
-        {% endfor %}
-    </ul>
+    <table>
+        <thead>
+            <tr>
+                <th>Stat</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stat in character_stats %}
+            <tr>
+                <td>{{ stat.stat.name }}</td>
+                <td>{{ stat.value }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
     <h2>Skills</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Skill</th>
+                <th>Tagged</th>
+                <th>Sum</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for skill in character_skill_attributes %}
+            <tr>
+                <td>{{ skill.skill.name }}</td>
+                <td>{{ '✓' if skill.attribute_id else '' }}</td>
+                <td>{{ skill.value + 2 if skill.attribute_id else skill.value }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Traits</h2>
     <ul>
-        {% for skill in character_skills %}
-        <li><strong>{{ skill.skill.name }}:</strong> {{ skill.value }}</li>
+        {% for trait in character_traits %}
+        <li><strong>{{ trait.trait.name }}:</strong> {{ trait.trait.description }}</li>
         {% endfor %}
     </ul>
 

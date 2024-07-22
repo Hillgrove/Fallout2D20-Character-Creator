@@ -35,6 +35,7 @@ class Character(db.Model):
     character_stats = db.relationship("CharacterStat", back_populates='character', cascade='all, delete-orphan')
     character_skill_attributes = db.relationship("CharacterSkillAttribute", back_populates='character', cascade='all, delete-orphan')
     character_perks = db.relationship("CharacterPerk", back_populates='character', cascade='all, delete-orphan')
+    character_traits = db.relationship("CharacterTrait", back_populates='character', cascade='all, delete-orphan', lazy='dynamic')
 
 
 class Stat(db.Model):
@@ -56,6 +57,18 @@ class CharacterStat(db.Model):
     # Relationships to Character and Stat
     character = db.relationship("Character", back_populates='character_stats')
     stat = db.relationship("Stat", back_populates='character_stats')
+
+
+class CharacterTrait(db.Model):
+    __tablename__ = "character_trait"
+    character_id = db.Column(db.Integer, db.ForeignKey("character.id"), primary_key=True)
+    trait_id = db.Column(db.Integer, db.ForeignKey("trait.id"), primary_key=True)
+    
+    # Relationships to Character and Trait
+    character = db.relationship("Character", back_populates='character_traits')
+    trait = db.relationship("Trait", back_populates='character_traits')
+
+    __table_args__ = (db.UniqueConstraint('character_id', 'trait_id', name='_character_trait_uc'),)
 
 
 class Skill(db.Model):
@@ -94,7 +107,6 @@ class CharacterSkillAttribute(db.Model):
     __table_args__ = (db.UniqueConstraint('character_id', 'skill_id', name='_character_skill_uc'),)
 
 
-
 class Origin(db.Model):
     __tablename__ = "origin"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -117,8 +129,9 @@ class Trait(db.Model):
     trait_data = db.Column(db.JSON, nullable=False)
     is_selectable = db.Column(db.Boolean, default=False)
 
-    # Relationship to OriginTrait
+    # Relationship to OriginTrait and CharacterTrait
     origin_traits = db.relationship("OriginTrait", back_populates='trait', cascade='all, delete-orphan')
+    character_traits = db.relationship("CharacterTrait", back_populates='trait', cascade='all, delete-orphan')
 
 
 class OriginTrait(db.Model):
