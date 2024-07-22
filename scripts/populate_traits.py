@@ -41,7 +41,10 @@ def populate_traits():
         {"name": "Small Frame", "description": "just a description", "trait_data": {}, "is_selectable": True},
         {"name": "Fast Shot", "description": "just a description", "trait_data": {}, "is_selectable": True},
         {"name": "Heavy Handed", "description": "+1 CD to melee and unarmed damage", "trait_data": {"bonus": "melee_damage", "amount": 1}, "is_selectable": True},
-        {"name": "Extra Perk", "description": "1 more perk", "trait_data": {"bonus": "extra_perk"}, "is_selectable": True}
+        {"name": "Extra Perk", "description": "1 more perk", "trait_data": {"bonus": "extra_perk"}, "is_selectable": True},
+        {"name": "Reduced END Test Difficulty", "description": "Reduces the difficulty of all END tests to resist the effects of disease.", "trait_data": {"effect": "reduce_END_test_difficulty"}, "is_selectable": False},
+        {"name": "Luck Point Recovery", "description": "Once per quest, the GM may introduce a complication related to your early life of isolation and confinement within the Vault. If the GM does this, you immediately regain one Luck Point.", "trait_data": {"effect": "luck_point_recovery"}, "is_selectable": False},
+        {"name": "Additional Tag Skill", "description": "Your carefully-planned upbringing means you have one additional tag skill of your choice.", "trait_data": {"bonus": "additional_tag_skill"}, "is_selectable": False}
     ]
 
     add_traits(traits)

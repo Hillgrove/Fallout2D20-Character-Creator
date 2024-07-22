@@ -40,15 +40,15 @@
 
         <!-- Background description section -->
         <div class="form-group row" id="background_description_section" style="display: none;">
-            <label for="origin_description" class="col-sm-3 col-form-label">Background Description</label>
+            <label for="origin_description" class="col-sm-3 col-form-label">Background</label>
             <div class="col-sm-9">
-                <p id="origin_description" class="form-control-static"></p>
+                <p id="origin_description" class="form-control-static">{{ origin_description|safe }}</p>
             </div>
         </div>
 
         <!-- Non-Selectable Trait section -->
         <div class="form-group row" id="non_selectable_traits_section" style="display: none;">
-            <label class="col-sm-3 col-form-label">Non-Selectable Traits</label>
+            <label class="col-sm-3 col-form-label">Traits</label>
             <div class="col-sm-9">
                 <ul id="non_selectable_traits">
                     <!-- Non-selectable traits will be dynamically inserted here -->
@@ -139,7 +139,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 submitButton.disabled = data.selectable_traits.length > 0;
 
                 // Update the description paragraph
-                document.getElementById('origin_description').innerText = data.description;
+                document.getElementById('origin_description').innerHTML = data.description;
+
 
                 // Update the selectable traits
                 var traitsDiv = document.getElementById('selectable_traits');

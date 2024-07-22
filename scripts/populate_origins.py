@@ -42,10 +42,18 @@ def populate_origins_and_traits():
     origins_with_traits = [
         {
             "name": "Vault Dweller",
-            "description": "A resident of one of the many Vaults created by Vault-Tec to preserve human life in the event of a nuclear apocalypse.",
+            "description": ("<p>Your healthier start to life at the hands of trained doctors and sophisticated auto-docs "
+                            "means you reduce the difficulty of all END tests to resist the effects of disease. In addition, "
+                            "your carefully-planned upbringing means you have one additional tag skill of your choice.</p>"
+                            "<p>You may also work with the Gamemaster to determine what sort of experiment took place within your Vault. "
+                            "Once per quest, the GM may introduce a complication which reflects the nature of the experiment you "
+                            "unwittingly took part in, or introduce a complication related to your early life of isolation and "
+                            "confinement within the Vault. If the GM does this, you immediately regain one Luck Point.</p>"),
             "selectable_traits_limit": 0,
             "traits": [
-                "Example Trait"
+                "Reduced END Test Difficulty",
+                "Luck Point Recovery",
+                "Additional Tag Skill"
             ]
         },
         {
