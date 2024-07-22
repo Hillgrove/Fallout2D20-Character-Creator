@@ -3,7 +3,7 @@ from flask import render_template, redirect, request, url_for, flash, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
 from app import app, db
 from app.forms import RegistrationForm, LoginForm, BackgroundForm, StatForm, PerkForm, DeleteForm, DynamicSkillForm
-from app.models import User, Character, Stat, CharacterStat, Perk, CharacterPerk, Skill, Origin, OriginTrait, CharacterSkillAttribute, Attribute, Trait, CharacterTrait
+from app.models import User, Character, Stat, CharacterStat, Perk, CharacterPerk, Skill, Origin, CharacterSkillAttribute, Attribute, CharacterTrait
 from werkzeug.security import generate_password_hash, check_password_hash
 import logging
 

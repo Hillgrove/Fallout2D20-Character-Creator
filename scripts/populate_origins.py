@@ -42,18 +42,56 @@ def populate_origins_and_traits():
     origins_with_traits = [
         {
             "name": "Vault Dweller",
-            "description": ("<p>Your healthier start to life at the hands of trained doctors and sophisticated auto-docs "
-                            "means you reduce the difficulty of all END tests to resist the effects of disease. In addition, "
-                            "your carefully-planned upbringing means you have one additional tag skill of your choice.</p>"
-                            "<p>You may also work with the Gamemaster to determine what sort of experiment took place within your Vault. "
-                            "Once per quest, the GM may introduce a complication which reflects the nature of the experiment you "
-                            "unwittingly took part in, or introduce a complication related to your early life of isolation and "
-                            "confinement within the Vault. If the GM does this, you immediately regain one Luck Point.</p>"),
+            "description": ("""<p>Your healthier start to life at the hands of trained doctors and sophisticated auto-docs
+                            means you reduce the difficulty of all END tests to resist the effects of disease. In addition, 
+                            your carefully-planned upbringing means you have one additional tag skill of your choice.</p>
+                            
+                            <p>You may also work with the Gamemaster to determine what sort of experiment took place within your Vault. 
+                            Once per quest, the GM may introduce a complication which reflects the nature of the experiment you 
+                            unwittingly took part in, or introduce a complication related to your early life of isolation and 
+                            confinement within the Vault. If the GM does this, you immediately regain one Luck Point.</p>"""),
             "selectable_traits_limit": 0,
             "traits": [
                 "Reduced END Test Difficulty",
                 "Luck Point Recovery",
                 "Additional Tag Skill"
+            ]
+        },
+        {
+            "name": "Survivor",
+            "description": ("""<p>You are the living legacy of the people who prepared
+                            for Armageddon on their own. You are only alive in
+                            the post-nuclear apocalyptic landscape because your
+                            forebears dug in, survived, and found community
+                            enough to continue humanity’s existence.</p>
+
+                            <p>You could be from any number of settlements, isolated
+                            shelters, or traveling groups that sparsely populate the
+                            wasteland from West Coast to East Coast. You could
+                            be from the New California Republic, carrying on the
+                            legacy of Vault 15 and Shady Sands. You could fight
+                            to protect others, calling a group of survivors like the
+                            Minutemen or the Regulators your home. You could
+                            also be a merciless raider or be born into one of these
+                            groups but escaped in order to rehabilitate and reform.</p>
+
+                            <p>Wherever you are from, or wherever you travel, making
+                            connections and laying down roots can be hard.
+                            Survivors are naturally wary of others, and are always
+                            on the lookout for the next conman, raiding party,
+                            or thief that will take their hard-earned resources.
+                            Travelling vast distances is difficult too, and many travelling
+                            survivors—particularly trading caravans—move
+                            between large settlements within their area of the
+                            wasteland, rather than travelling from coast to coast.</p>"""),
+            "selectable_traits_limit": 2,
+            "traits": [
+                "Educated",
+                "Fast Shot",
+                "Gifted",
+                "Heavy Handed",
+                "Small Frame",
+                "Extra Perk"
             ]
         },
         {
@@ -112,19 +150,6 @@ def populate_origins_and_traits():
             "selectable_traits_limit": 0,
             "traits": [
                 "Example Trait"
-            ]
-        },
-        {
-            "name": "Survivor",
-            "description": "A hardy individual who has learned to thrive in the harsh post-apocalyptic world.",
-            "selectable_traits_limit": 2,
-            "traits": [
-                "Educated",
-                "Gifted",
-                "Small Frame",
-                "Fast Shot",
-                "Heavy Handed",
-                "Extra Perk"
             ]
         }
     ]
