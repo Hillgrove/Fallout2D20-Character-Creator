@@ -91,10 +91,8 @@ function changeStatValue(inputId, delta) {
     input.value = currentValue;
 
     // Trigger input event to update the total
-    const skillRow = input.closest('.skill-row');
-    if (skillRow) {
-        updateTotal(skillRow);
-    }
+    const event = new Event('input', { bubbles: true });
+    input.dispatchEvent(event);
 }
 </script>
 {% endblock %}
