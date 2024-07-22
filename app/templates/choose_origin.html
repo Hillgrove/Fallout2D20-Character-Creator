@@ -59,7 +59,6 @@
         <!-- Selectable Trait section -->
         <div class="form-group row" id="selectable_traits_section" style="display: none;">
             <label class="col-sm-3 col-form-label">{{ form.selectable_traits.label.text }}</label>
-            
             <div class="col-sm-9">
                 <div id="selectable_traits">
                     {% for subfield in form.selectable_traits %}
@@ -74,11 +73,18 @@
                 <div id="selectable_traits_counter" class="text-muted">
                     0 / <span id="selectable_traits_limit">0</span> traits selected
                 </div>
-
             </div>
         </div>
 
-
+        <!-- Descriptions for selected traits -->
+        <div class="form-group row mt-3" id="selected_traits_descriptions_section" style="display: none;">
+            {# <label class="col-sm-3 col-form-label">Selected Traits Descriptions</label> #}
+            <div class="col-sm-9">
+                <div id="selected_traits_descriptions" class="mt-2">
+                    <!-- Descriptions will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
 
         <!-- Next button -->
         <div class="form-group row">
@@ -86,22 +92,19 @@
                 {{ form.submit(class="btn btn-primary", id="submit-button", disabled=True) }}
             </div>
         </div>
-
-
     </form>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('origin_id').addEventListener('change', function() {
-        // Get the selected background ID
         var originId = this.value;
 
-        // Sections to show/hide
         var specialStatsSection = document.getElementById('special_stats_section');
         var backgroundDescriptionSection = document.getElementById('background_description_section');
         var selectableTraitsSection = document.getElementById('selectable_traits_section');
         var nonSelectableTraitsSection = document.getElementById('non_selectable_traits_section');
+        var selectedTraitsDescriptionsSection = document.getElementById('selected_traits_descriptions_section');
         var form = document.getElementById('create-character-form');
         var traitsCounter = document.getElementById('selectable_traits_counter');
         var traitsLimitSpan = document.getElementById('selectable_traits_limit');
@@ -112,39 +115,37 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('selectable_traits').innerHTML = '';
             document.getElementById('special_stats').innerHTML = '';
             document.getElementById('non_selectable_traits').innerHTML = '';
+            document.getElementById('selected_traits_descriptions').innerHTML = '';
 
             specialStatsSection.style.display = 'none';
             backgroundDescriptionSection.style.display = 'none';
             selectableTraitsSection.style.display = 'none';
             nonSelectableTraitsSection.style.display = 'none';
+            selectedTraitsDescriptionsSection.style.display = 'none';
             traitsCounter.style.display = 'none';
             submitButton.disabled = true;
 
             return;
         }
 
-        // Disable the "Select an Origin" option
         this.options[0].disabled = true;
 
-        // Make an AJAX request to fetch the description, selectable traits, and S.P.E.C.I.A.L stats
         fetch('{{ url_for("get_origin_description") }}?origin_id=' + originId)
             .then(response => response.json())
             .then(data => {
-                // Show the sections
+
                 specialStatsSection.style.display = 'block';
                 backgroundDescriptionSection.style.display = 'block';
                 selectableTraitsSection.style.display = data.selectable_traits.length > 0 ? 'block' : 'none';
                 nonSelectableTraitsSection.style.display = data.non_selectable_traits.length > 0 ? 'block' : 'none';
                 traitsCounter.style.display = data.selectable_traits.length > 0 ? 'block' : 'none';
+                selectedTraitsDescriptionsSection.style.display = 'block';
                 submitButton.disabled = data.selectable_traits.length > 0;
 
-                // Update the description paragraph
                 document.getElementById('origin_description').innerHTML = data.description;
 
-
-                // Update the selectable traits
                 var traitsDiv = document.getElementById('selectable_traits');
-                traitsDiv.innerHTML = ''; // Clear previous options
+                traitsDiv.innerHTML = '';
 
                 data.selectable_traits.forEach(function(trait) {
                     var div = document.createElement('div');
@@ -156,6 +157,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     checkbox.name = 'selectable_traits';
                     checkbox.value = trait.id;
                     checkbox.id = 'selectable_trait_' + trait.id;
+                    checkbox.setAttribute('data-description', trait.description);
+                    checkbox.setAttribute('data-name', trait.name); // Add name attribute
 
                     var label = document.createElement('label');
                     label.className = 'form-check-label';
@@ -167,13 +170,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     traitsDiv.appendChild(div);
 
-                    // Add event listener for updating the counter
                     checkbox.addEventListener('change', updateTraitsCounter);
+                    checkbox.addEventListener('change', updateTraitsDescriptions);
                 });
 
-                // Update the non-selectable traits
                 var nonSelectableTraitsDiv = document.getElementById('non_selectable_traits');
-                nonSelectableTraitsDiv.innerHTML = ''; // Clear previous traits
+                nonSelectableTraitsDiv.innerHTML = '';
 
                 data.non_selectable_traits.forEach(function(trait) {
                     var li = document.createElement('li');
@@ -181,17 +183,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     nonSelectableTraitsDiv.appendChild(li);
                 });
 
-                // Update the S.P.E.C.I.A.L stats
                 var statsDiv = document.getElementById('special_stats');
-                statsDiv.innerHTML = ''; // Clear previous stats
+                statsDiv.innerHTML = '';
 
                 data.special_stats.forEach(function(stat) {
                     var div = document.createElement('div');
-                    div.className = 'col-sm-12 d-flex align-items-center'; // Bootstrap class for full-width column and centering
+                    div.className = 'col-sm-12 d-flex align-items-center';
 
                     var label = document.createElement('label');
-                    label.className = 'col-sm-2 mb-0'; // Removed col-form-label and added mb-0 for no margin-bottom
-                    label.style.padding = '0'; // Remove padding
+                    label.className = 'col-sm-2 mb-0';
+                    label.style.padding = '0';
                     label.innerText = stat.name + ': ';
 
                     var span = document.createElement('span');
@@ -204,18 +205,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     statsDiv.appendChild(div);
                 });
 
-                // Update the selectable traits limit in the form data
                 form.setAttribute('data-trait-limit', data.selectable_traits_limit);
                 if (traitsLimitSpan) {
                     traitsLimitSpan.innerText = data.selectable_traits_limit;
                 }
                 updateTraitsCounter();
+                updateTraitsDescriptions();
             });
     });
 
     function updateTraitsCounter() {
         var form = document.getElementById('create-character-form');
-        var traitLimit = form.getAttribute('data-trait-limit');
+        var traitLimit = parseInt(form.getAttribute('data-trait-limit'), 10);
         var selectedTraits = document.querySelectorAll('input[name="selectable_traits"]:checked').length;
         var counter = document.getElementById('selectable_traits_counter');
         var submitButton = document.getElementById('submit-button');
@@ -224,14 +225,40 @@ document.addEventListener('DOMContentLoaded', function() {
             counter.innerHTML = selectedTraits + ' / ' + traitLimit + ' traits selected';
         }
 
+        var checkboxes = document.querySelectorAll('input[name="selectable_traits"]');
+        checkboxes.forEach(function(checkbox) {
+            if (selectedTraits >= traitLimit) {
+                if (!checkbox.checked) {
+                    checkbox.disabled = true;
+                }
+            } else {
+                checkbox.disabled = false;
+            }
+        });
+
         if (selectedTraits == traitLimit) {
             submitButton.disabled = false;
         } else {
             submitButton.disabled = true;
         }
     }
+
+    function updateTraitsDescriptions() {
+        var selectedTraitsDescriptionsDiv = document.getElementById('selected_traits_descriptions');
+        selectedTraitsDescriptionsDiv.innerHTML = ''; // Clear previous descriptions
+
+        var selectedTraits = document.querySelectorAll('input[name="selectable_traits"]:checked');
+        selectedTraits.forEach(function(trait) {
+            var name = trait.getAttribute('data-name');
+            var description = trait.getAttribute('data-description');
+            if (name && description) {
+                var p = document.createElement('p');
+                p.innerHTML = '<strong>' + name + '</strong> - ' + description;
+                selectedTraitsDescriptionsDiv.appendChild(p);
+            }
+        });
+    }
 });
 </script>
-
 
 {% endblock %}
