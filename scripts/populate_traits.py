@@ -36,15 +36,19 @@ def populate_traits():
         {"name": "Endurance Max", "description": "Endurance can be raised to a max of 12.", "trait_data": {"stat": "Endurance", "max": 12}},
         {"name": "Charisma Max", "description": "Charisma can be raised to a max of 6.", "trait_data": {"stat": "Charisma", "max": 6}},
         {"name": "Intelligence Max", "description": "Intelligence can be raised to a max of 6.", "trait_data": {"stat": "Intelligence", "max": 6}},
-        {"name": "Educated", "description": "You have one additional tag skill.", "trait_data": {"bonus": "extra_tag_skill"}, "is_selectable": True},
+        {"name": "Educated", "description": "You have one additional tag skill.", "trait_data": {"extra_tag_skills": 1}, "is_selectable": True},
         {"name": "Fast Shot", "description": "If you take a second major action in combat, and use it to make a ranged attack, the additional major action only costs 1 AP, rather than 2.", "trait_data": {}, "is_selectable": True},
-        {"name": "Gifted", "description": "Choose two S.P.E.C.I.A.L. attributes and increase them by +1 each.", "trait_data": {"bonus": "extra_special_points", "amount": 2}, "is_selectable": True},
-        {"name": "Heavy Handed", "description": "Your Melee Damage bonus increases by +1 CD", "trait_data": {"bonus": "melee_damage", "amount": 1}, "is_selectable": True},
+        {"name": "Gifted", "description": "Choose two S.P.E.C.I.A.L. attributes and increase them by +1 each.", "trait_data": {"extra_special_points": 2}, "is_selectable": True},
+        {"name": "Heavy Handed", "description": "Your Melee Damage bonus increases by +1 CD", "trait_data": {"extra_melee_damage": 1}, "is_selectable": True},
         {"name": "Small Frame", "description": "You may re-roll 1d20 on all AGI tests which rely on balance or contortion.", "trait_data": {}, "is_selectable": True},
-        {"name": "Extra Perk", "description": "1 more perk", "trait_data": {"bonus": "extra_perk"}, "is_selectable": True},
-        {"name": "Reduced END Test Difficulty", "description": "Reduces the difficulty of all END tests to resist the effects of disease.", "trait_data": {"effect": "reduce_END_test_difficulty"}, "is_selectable": False},
-        {"name": "Luck Point Recovery", "description": "Once per quest, the GM may introduce a complication related to your early life of isolation and confinement within the Vault. If the GM does this, you immediately regain one Luck Point.", "trait_data": {"effect": "luck_point_recovery"}, "is_selectable": False},
-        {"name": "Additional Tag Skill", "description": "Your carefully-planned upbringing means you have one additional tag skill of your choice.", "trait_data": {"bonus": "additional_tag_skill"}, "is_selectable": False}
+        {"name": "Extra Perk", "description": "1 more perk", "trait_data": {"extra_perks": 1}, "is_selectable": True},
+        {"name": "Reduced END Test Difficulty", "description": "Reduces the difficulty of all END tests to resist the effects of disease.", "trait_data": {}, "is_selectable": False},
+        {"name": "Luck Point Recovery", "description": "Once per quest, the GM may introduce a complication related to your early life of isolation and confinement within the Vault. If the GM does this, you immediately regain one Luck Point.", "trait_data": {}, "is_selectable": False},
+        {"name": "Additional Tag Skill", "description": "Your carefully-planned upbringing means you have one additional tag skill of your choice.", "trait_data": {"extra_tag_skills": 1}, "is_selectable": False},
+        {"name": "Tag Energy Weapons", "description": "Free tag in Energy Weapons", "trait_data": {"tag": "Energy Weapons"}, "is_selectable": True},
+        {"name": "Tag Repair", "description": "Free tag in Repair", "trait_data": {"tag": "Repair"}, "is_selectable": True},
+        {"name": "Tag Science", "description": "Free tag in Science", "trait_data": {"tag": "Science"}, "is_selectable": True},
+
     ]
 
     add_traits(traits)

@@ -95,16 +95,26 @@ def populate_origins_and_traits():
             ]
         },
         {
-            "name": "Wastelander",
-            "description": "A survivor from the harsh, irradiated wasteland. Adapted to scavenging and surviving in the ruins of civilization.",
-            "selectable_traits_limit": 0,
+            "name": "Brotherhood of Steel",
+            "description": ("""<p>As a member of the Brotherhood of Steel, you are bound by
+                            the chain of command: The Chain that Binds. You must carry
+                            out the orders of your immediate superiors, and you are
+                            responsible for your subordinate siblings. If you do not carry
+                            out your duty, you are expelled from the Brotherhood and
+                            your technology will be reclaimed—by any means necessary</p>
+                            
+                            <p>You gain one additional Tag skill, which must be one of
+                            Energy Weapons, Science, or Repair.</p>"""),
+            "selectable_traits_limit": 1,
             "traits": [
-                "Example Trait"
+                "Tag Energy Weapons",
+                "Tag Science", 
+                "Tag Repair"
             ]
         },
         {
-            "name": "Brotherhood of Steel",
-            "description": "A member of the Brotherhood of Steel, a group dedicated to preserving pre-war technology and combating the threats of the wasteland.",
+            "name": "Wastelander",
+            "description": "A survivor from the harsh, irradiated wasteland. Adapted to scavenging and surviving in the ruins of civilization.",
             "selectable_traits_limit": 0,
             "traits": [
                 "Example Trait"
