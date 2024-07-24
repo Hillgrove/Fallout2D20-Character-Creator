@@ -136,46 +136,118 @@ def populate_origins_and_traits():
             ]
         },
         {
-            "name": "Wastelander",
-            "description": "A survivor from the harsh, irradiated wasteland. Adapted to scavenging and surviving in the ruins of civilization.",
-            "selectable_traits_limit": 0,
+            "name": "Mister Handy",
+            "description": ("""<p>The General Atomics International robot “Mister
+                            Handy” exploded onto the robotic market as a
+                            reliable construction robot, known for its durability
+                            and ease of maintenance, but its real breakthrough
+                            came in a collaboration with RobCo to produce a
+                            domestic model.</p>
+
+                            <p>You are one of these domestic automatons, produced
+                            some time between 2037 and 2077, seeking to provide
+                            every household in America with butler-like servitude.
+                            Equipped with state-of-the-art programming, you have
+                            initiative and can adapt your own coding to learn more
+                            from your environment. This capacity for self-determination
+                            is what has enabled your survival beyond the
+                            Great War; where other robots may have broken down,
+                            you have managed to shake loose from the shackles of
+                            your programming and find a life for yourself.</p>
+
+                            <p>Many models exist, and you could come from any
+                            of the Mister Handy, Mister Gutsy, Miss Nanny, or
+                            Mister Orderly series. You are powered by a nuclear
+                            core, can replace your own fuel, and repair yourself
+                            or other Mister Handy units. Your model has three
+                            mechanical arms and three mechanical eyes on stalks,
+                            and your jet propulsion keeps you hovering above the
+                            ground, providing you have all the fuel you need. With
+                            this rugged design, you have survived so far.</p>
+                            
+                            <p>You have 360° vision and improved sensory systems that
+                            can detect smells, chemicals, and radiation, reducing the
+                            difficulty of Perception tests that rely on sight and smell by
+                            1. You are also immune to radiation and poison damage,
+                            but you cannot use chems, nor can you benefit from food,
+                            drink, or rest. You move by jet propulsion, hovering above
+                            the ground, unaffected by difficult terrain or obstacles. Your
+                            carry weight is 150 lbs., and it cannot be increased by
+                            your Strength or perks, but it can be increased by modified
+                            armor. You cannot recover from your own injuries or
+                            heal health points without receiving repairs.</p>
+
+                            <p>You cannot manipulate the physical
+                            world like humans do, instead you have
+                            three of the arm attachments in the Arm
+                            Attachments table, determined by your
+                            choice of equipment pack. If you select an arm
+                            that features a weapon, you also gain 20 shots of
+                            ammo for that weapon.</p>"""),
+            "selectable_traits_limit": 3,
             "traits": [
-                "Example Trait"
+                "Improved Sensors",
+                "Immune to Radiation",
+                "Immune to Poison",
+                "Robo Body",
+                "Hovering",
+                "Robo Carry",
+                "Robo Recovery",
+                "Robo Pistol",
+                "Robo Saw",
+                "Robo Flamer",
+                "Robo Laser",
+                "Robo Pincer"
             ]
         },
         {
             "name": "Super Mutant",
-            "description": "A human mutated by the Forced Evolutionary Virus (FEV), possessing great strength and resilience but often viewed as a monster by others.",
+            "description": ("""<p>You are a brutal, mutated human, forced to evolve
+                            from thoughtless experiments by the twisted science
+                            of the pre- and post-war world. Infected with
+                            the Forced Evolutionary Virus (F.E.V.), your body has
+                            mutated into a tall, muscular killing machine, filled
+                            with a rage.</p>
+
+                            <p>You could have originated from the Master’s army
+                            at the Mariposa military base, California, created
+                            as he experimented on unwilling human victims,
+                            splitting into one of the factions upon his death to
+                            attack or rebuild the wasteland with its survivors.
+                            Your origins could be rooted in the Evolutionary
+                            Experimentation Program of Vault 87, whose super
+                            mutant groups terrorize the Capital Wasteland. You
+                            could have been abducted from the Commonwealth
+                            and exposed to the F.E.V. by the Institute and disposed
+                            of back into the wasteland to fend for yourself
+                            in small bands of raiders. Or finally, you could have
+                            been a resident of Huntersville, Appalachia, whose
+                            water supply was contaminated with the virus and
+                            the mutations went unchecked.</p>
+                            
+                            <p>Your initial Strength and Endurance attributes are increased
+                            by +2 each, and your maximum Strength and Endurance
+                            are increased to 12, but your maximum Intelligence and
+                            Charisma are both reduced to 6. You may not have more
+                            than 4 ranks in any skill. You are completely immune to
+                            radiation and poison damage.
+                            You stand over seven feet tall, and your body is bulky and
+                            muscular. Your skin is green, yellow, or grey, regardless of
+                            what color it was when you were human. You do not seem to
+                            age, but you are sterile.
+                            You can only wear armor
+                            which has been made to
+                            fit a super mutant.</p>"""),
             "selectable_traits_limit": 0,
-            "traits": [
+            "traits": [               
+                "Immune to Radiation",
+                "Immune to Poison",
+                "Super Mutant Ranks",
+                "Super Mutant Armor",
                 "Strength Max",
                 "Endurance Max",
                 "Charisma Max",
                 "Intelligence Max"
-            ]
-        },
-        {
-            "name": "Raider",
-            "description": "A member of a brutal gang of marauders, living by raiding and pillaging the remains of civilization.",
-            "selectable_traits_limit": 0,
-            "traits": [
-                "Example Trait"
-            ]
-        },
-        {
-            "name": "NCR Citizen",
-            "description": "A citizen of the New California Republic, a large faction aiming to restore order and democracy in the post-apocalyptic world.",
-            "selectable_traits_limit": 0,
-            "traits": [
-                "Example Trait"
-            ]
-        },
-        {
-            "name": "Enclave",
-            "description": "A member of the Enclave, the remnants of the pre-war United States government and military, known for their advanced technology and secretive nature.",
-            "selectable_traits_limit": 0,
-            "traits": [
-                "Example Trait"
             ]
         }
     ]

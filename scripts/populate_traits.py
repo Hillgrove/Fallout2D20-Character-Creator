@@ -50,10 +50,22 @@ def populate_traits():
         {"name": "Tag Science", "description": "Free tag in Science", "trait_data": {"tag": "Science"}, "is_selectable": True},
         {"name": "Rad Healing", "description": "You regain 1 HP for every 3 points of radiation damage inflicted upon you.", "trait_data": {}, "is_selectable": False},
         {"name": "Rad Resting", "description": "When resting in an irradiated location, you may re-roll your dice pool when checking if your injuries heal", "trait_data": {}, "is_selectable": False},
-        {"name": "Tag Survival", "description": "Free tag in Survival", "trait_data": {"tag": "Survival"}, "is_selectable": False}
-
+        {"name": "Tag Survival", "description": "Free tag in Survival", "trait_data": {"tag": "Survival"}, "is_selectable": False},
+        {"name": "Improved Sensors", "description": "You have 360° vision and improved sensory systems that can detect smells, chemicals, and radiation, reducing the difficulty of Perception tests that rely on sight and smell by 1.", "trait_data": {}, "is_selectable": False},
+        {"name": "Immune to Radiation", "description": "You are immune to radiation.", "trait_data": {}, "is_selectable": False},
+        {"name": "Immune to Poison", "description": "You are also immune to poison.", "trait_data": {}, "is_selectable": False},
+        {"name": "Robo Body", "description": "You cannot use chems, nor can you benefit from food, drink, or rest.", "trait_data": {}, "is_selectable": False},
+        {"name": "Robo Recovery", "description": "You cannot recover from your own injuries or heal health points without receiving repairs.", "trait_data": {}, "is_selectable": False},
+        {"name": "Robo Carry", "description": "Your carry weight is 150 lbs., and it cannot be increased by your Strength or perks, but it can be increased by modified armor.", "trait_data": {"carry_weight": 150}, "is_selectable": False},
+        {"name": "Hovering", "description": "You move by jet propulsion, hovering above the ground, unaffected by difficult terrain or obstacles.", "trait_data": {}, "is_selectable": False},
+        {"name": "Robo Pistol", "description": "You can make ranged attacks using a 10mm auto pistol.", "trait_data": {}, "is_selectable": True},
+        {"name": "Robo Saw", "description": "You can cut objects and make melee attacks with a circular saw. The buzz-saw inflicts 3 DC Piercing 1 physical damage", "trait_data": {}, "is_selectable": True},
+        {"name": "Robo Flamer", "description": "You can set objects alight, cook food, or make ranged attacks with a short-range flamethrower", "trait_data": {}, "is_selectable": True},
+        {"name": "Robo Laser", "description": "You can cut objects or make ranged attacks using a laser", "trait_data": {}, "is_selectable": True},
+        {"name": "Robo Pincer", "description": "You can pick up objects with an individual pincer that weighes no more than 40 lbs. and manipulate objects in your environment. You may also make unarmed attacks (2 DC physical damage) with the pincer.", "trait_data": {}, "is_selectable": True},
+        {"name": "Super Mutant Ranks", "description": "You may not have more than 4 ranks in any skill.", "trait_data": {"Max Ranks": 4}, "is_selectable": False},
+        {"name": "Super Mutant Armor", "description": "You can only wear armor which has been made to fit a super mutant.", "trait_data": {}, "is_selectable": False}
         # {"name": "", "description": "", "trait_data": {}, "is_selectable": False}
-
     ]
 
     add_traits(traits)
