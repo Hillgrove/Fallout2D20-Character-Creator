@@ -48,6 +48,11 @@ def populate_traits():
         {"name": "Tag Energy Weapons", "description": "Free tag in Energy Weapons", "trait_data": {"tag": "Energy Weapons"}, "is_selectable": True},
         {"name": "Tag Repair", "description": "Free tag in Repair", "trait_data": {"tag": "Repair"}, "is_selectable": True},
         {"name": "Tag Science", "description": "Free tag in Science", "trait_data": {"tag": "Science"}, "is_selectable": True},
+        {"name": "Rad Healing", "description": "You regain 1 HP for every 3 points of radiation damage inflicted upon you.", "trait_data": {}, "is_selectable": False},
+        {"name": "Rad Resting", "description": "When resting in an irradiated location, you may re-roll your dice pool when checking if your injuries heal", "trait_data": {}, "is_selectable": False},
+        {"name": "Tag Survival", "description": "Free tag in Survival", "trait_data": {"tag": "Survival"}, "is_selectable": False}
+
+        # {"name": "", "description": "", "trait_data": {}, "is_selectable": False}
 
     ]
 
