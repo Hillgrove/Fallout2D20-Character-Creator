@@ -98,6 +98,9 @@ function updateDerivedStats() {
     var luck = parseInt(document.getElementById('luck').value);
     
     var carryWeight = {{ carry_weight_base }} + (strength * 10);
+    if ({{ carry_weight_trait|tojson }}) {
+        carryWeight = {{ carry_weight_base }};
+    }
     document.getElementById('carry_weight').innerText = carryWeight;
 
     var initiative = perception + agility;
