@@ -43,6 +43,9 @@
         <h2>Derived Stats</h2>
         <p>Carry Weight: <span id="carry_weight"></span> lbs.</p>
         <p>Initiative: <span id="initiative"></span></p>
+        <p>Defense: <span id="defense"></span></p>
+        <p>Hitpoints: <span id="hitpoints"></span></p>
+        <p>Melee Damage: <span id="melee_damage"></span></p>
     </div>
 </div>
 
@@ -90,13 +93,34 @@ function updateTotalPoints() {
 function updateDerivedStats() {
     var strength = parseInt(document.getElementById('strength').value);
     var perception = parseInt(document.getElementById('perception').value);
+    var endurance = parseInt(document.getElementById('endurance').value);
     var agility = parseInt(document.getElementById('agility').value);
+    var luck = parseInt(document.getElementById('luck').value);
     
     var carryWeight = {{ carry_weight_base }} + (strength * 10);
+    if ({{ carry_weight_trait|tojson }}) {
+        carryWeight = {{ carry_weight_base }};
+    }
     document.getElementById('carry_weight').innerText = carryWeight;
 
     var initiative = perception + agility;
     document.getElementById('initiative').innerText = initiative;
+
+    var defense = agility >= 9 ? 2 : 1;
+    document.getElementById('defense').innerText = defense;
+
+    var hitpoints = endurance + luck;
+    document.getElementById('hitpoints').innerText = hitpoints;
+
+    var meleeDamage = 0;
+    if (strength >= 11) {
+        meleeDamage = 3;
+    } else if (strength >= 9) {
+        meleeDamage = 2;
+    } else if (strength >= 7) {
+        meleeDamage = 1;
+    }
+    document.getElementById('melee_damage').innerText = meleeDamage;
 }
 
 updateTotalPoints();

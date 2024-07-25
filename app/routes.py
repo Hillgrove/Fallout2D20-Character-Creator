@@ -165,22 +165,21 @@ def choose_stats(character_id):
             stats = {stat_name: getattr(form, stat_name.lower()).data for stat_name in ["Strength", "Perception", "Endurance", "Charisma", "Intelligence", "Agility", "Luck"]}
             if sum(stats.values()) > character.starting_stat_points:
                 flash("You have exceeded the allowed stat points.", "danger")
-                return render_template("choose_stats.html", form=form, character=character, stats=Stat.query.all(), carry_weight_base=carry_weight_base)
-
-            for stat_name, stat_value in stats.items():
-                stat = Stat.query.filter_by(name=stat_name).first()
-                if stat:
-                    character_stat = CharacterStat(character_id=character.id, stat_id=stat.id, value=stat_value)
-                    db.session.add(character_stat)
-
-            db.session.commit()
-            return redirect(url_for("choose_perks", character_id=character.id))
+            else:
+                for stat_name, stat_value in stats.items():
+                    stat = Stat.query.filter_by(name=stat_name).first()
+                    if stat:
+                        character_stat = CharacterStat(character_id=character.id, stat_id=stat.id, value=stat_value)
+                        db.session.add(character_stat)
+                db.session.commit()
+                return redirect(url_for("choose_perks", character_id=character.id))
         except Exception as e:
             db.session.rollback()
             logging.error(f"Error saving stats: {e}")
             flash("An error occurred while saving your stats. Please try again.", "danger")
 
-    return render_template("choose_stats.html", form=form, character=character, stats=Stat.query.all(), carry_weight_base=carry_weight_base)
+    return render_template("choose_stats.html", form=form, character=character, stats=Stat.query.all(), carry_weight_base=carry_weight_base, carry_weight_trait=carry_weight_trait is not None)
+
 
 
 
