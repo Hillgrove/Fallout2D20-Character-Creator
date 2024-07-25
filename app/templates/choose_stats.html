@@ -42,6 +42,7 @@
     <div class="mt-4">
         <h2>Derived Stats</h2>
         <p>Carry Weight: <span id="carry_weight"></span> lbs.</p>
+        <p>Initiative: <span id="initiative"></span></p>
     </div>
 </div>
 
@@ -88,8 +89,14 @@ function updateTotalPoints() {
 
 function updateDerivedStats() {
     var strength = parseInt(document.getElementById('strength').value);
+    var perception = parseInt(document.getElementById('perception').value);
+    var agility = parseInt(document.getElementById('agility').value);
+    
     var carryWeight = {{ carry_weight_base }} + (strength * 10);
     document.getElementById('carry_weight').innerText = carryWeight;
+
+    var initiative = perception + agility;
+    document.getElementById('initiative').innerText = initiative;
 }
 
 updateTotalPoints();
