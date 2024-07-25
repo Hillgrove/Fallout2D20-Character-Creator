@@ -38,21 +38,22 @@
             {{ form.submit(class="btn btn-primary") }}
         </div>
     </form>
+
+    <div class="mt-4">
+        <h2>Derived Stats</h2>
+        <p>Carry Weight: <span id="carry_weight"></span> lbs.</p>
+    </div>
 </div>
 
 <script>
 function changeStatValue(statId, delta) {
-    // Get the input element by ID
     var input = document.getElementById(statId);
     var min = parseInt(input.min);
     var max = parseInt(input.max);
     var value = parseInt(input.value) + delta;
 
-    // Ensure the value stays within the allowed range
     if (value >= min && value <= max) {
         input.value = value;
-
-        // Update the total points
         updateTotalPoints();
     }
 }
@@ -62,7 +63,6 @@ function updateTotalPoints() {
     var spentPoints = 0;
     var statFields = Array.from(document.querySelectorAll('input[type="number"]')).map(input => input.id);
 
-    // Calculate spent points as the sum of all stat values
     statFields.forEach(function(statField) {
         var input = document.getElementById(statField);
         if (input) {
@@ -70,26 +70,28 @@ function updateTotalPoints() {
         }
     });
 
-    // Update the total points display
     var remainingPoints = totalPoints - spentPoints;
     document.getElementById('total_points').innerText = remainingPoints;
 
-    // Disable/enable buttons based on remaining points
     statFields.forEach(function(statField) {
         var input = document.getElementById(statField);
         if (input) {
             var value = parseInt(input.value);
 
-            // Disable increase button if no points left or value is max
             document.querySelector(`button[onclick="changeStatValue('${statField}', 1)"]`).disabled = remainingPoints <= 0 || value >= parseInt(input.max);
-
-            // Disable decrease button if value is min
             document.querySelector(`button[onclick="changeStatValue('${statField}', -1)"]`).disabled = value <= parseInt(input.min);
         }
     });
+
+    updateDerivedStats();
 }
 
-// Initial call to update the total points
+function updateDerivedStats() {
+    var strength = parseInt(document.getElementById('strength').value);
+    var carryWeight = {{ carry_weight_base }} + (strength * 10);
+    document.getElementById('carry_weight').innerText = carryWeight;
+}
+
 updateTotalPoints();
 </script>
 {% endblock %}

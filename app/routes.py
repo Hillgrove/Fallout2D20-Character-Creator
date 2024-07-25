@@ -150,13 +150,22 @@ def get_origin_description():
 def choose_stats(character_id):
     character = Character.query.get_or_404(character_id)
     form = StatForm(origin_id=character.origin_id)
+    
+    # Fetch the traits related to the character's origin
+    traits = [trait.trait for trait in character.origin.origin_traits]
+    carry_weight_trait = next((trait for trait in traits if 'carry_weight' in trait.trait_data), None)
+    
+    carry_weight_base = 150
+    if carry_weight_trait:
+        carry_weight_base = carry_weight_trait.trait_data['carry_weight']
+
     if form.validate_on_submit():
         try:
             CharacterStat.query.filter_by(character_id=character.id).delete()
             stats = {stat_name: getattr(form, stat_name.lower()).data for stat_name in ["Strength", "Perception", "Endurance", "Charisma", "Intelligence", "Agility", "Luck"]}
             if sum(stats.values()) > character.starting_stat_points:
                 flash("You have exceeded the allowed stat points.", "danger")
-                return render_template("choose_stats.html", form=form, character=character, stats=Stat.query.all())
+                return render_template("choose_stats.html", form=form, character=character, stats=Stat.query.all(), carry_weight_base=carry_weight_base)
 
             for stat_name, stat_value in stats.items():
                 stat = Stat.query.filter_by(name=stat_name).first()
@@ -170,7 +179,9 @@ def choose_stats(character_id):
             db.session.rollback()
             logging.error(f"Error saving stats: {e}")
             flash("An error occurred while saving your stats. Please try again.", "danger")
-    return render_template("choose_stats.html", form=form, character=character, stats=Stat.query.all())
+
+    return render_template("choose_stats.html", form=form, character=character, stats=Stat.query.all(), carry_weight_base=carry_weight_base)
+
 
 
 @app.route("/choose_perks/<int:character_id>", methods=["GET", "POST"])
