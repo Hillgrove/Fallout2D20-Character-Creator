@@ -144,7 +144,6 @@ def get_origin_description():
     return jsonify(response_data)
 
 
-
 @app.route("/choose_stats/<int:character_id>", methods=["GET", "POST"])
 @login_required
 def choose_stats(character_id):
@@ -156,14 +155,19 @@ def choose_stats(character_id):
     carry_weight_trait = next((trait for trait in traits if 'carry_weight' in trait.trait_data), None)
     
     carry_weight_base = 150
+    extra_special_points = 0
     if carry_weight_trait:
         carry_weight_base = carry_weight_trait.trait_data['carry_weight']
+    
+    extra_special_points_trait = next((trait for trait in traits if 'extra_special_points' in trait.trait_data), None)
+    if extra_special_points_trait:
+        extra_special_points = extra_special_points_trait.trait_data['extra_special_points']
 
     if form.validate_on_submit():
         try:
             CharacterStat.query.filter_by(character_id=character.id).delete()
             stats = {stat_name: getattr(form, stat_name.lower()).data for stat_name in ["Strength", "Perception", "Endurance", "Charisma", "Intelligence", "Agility", "Luck"]}
-            if sum(stats.values()) > character.starting_stat_points:
+            if sum(stats.values()) > character.starting_stat_points + extra_special_points:
                 flash("You have exceeded the allowed stat points.", "danger")
             else:
                 for stat_name, stat_value in stats.items():
@@ -178,8 +182,7 @@ def choose_stats(character_id):
             logging.error(f"Error saving stats: {e}")
             flash("An error occurred while saving your stats. Please try again.", "danger")
 
-    return render_template("choose_stats.html", form=form, character=character, stats=Stat.query.all(), carry_weight_base=carry_weight_base, carry_weight_trait=carry_weight_trait is not None)
-
+    return render_template("choose_stats.html", form=form, character=character, stats=Stat.query.all(), carry_weight_base=carry_weight_base, carry_weight_trait=carry_weight_trait is not None, extra_special_points=extra_special_points)
 
 
 

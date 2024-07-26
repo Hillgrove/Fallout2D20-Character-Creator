@@ -23,7 +23,7 @@
                         <div class="input-group-prepend">
                             <button type="button" class="btn btn-secondary" onclick="changeStatValue('{{ field.name }}', -1)">-</button>
                         </div>
-                        <input type="number" name="{{ field.name }}" id="{{ field.name }}" class="form-control text-center" value="{{ field.data or 5 }}" min="{{ field.validators[-1].min }}" max="{{ field.validators[-1].max }}" readonly>
+                        <input type="number" name="{{ field.name }}" id="{{ field.name }}" class="form-control text-center" value="{{ field.data or 4 }}" min="{{ field.validators[-1].min }}" max="{{ field.validators[-1].max }}" readonly>
                         <div class="input-group-append">
                             <button type="button" class="btn btn-secondary" onclick="changeStatValue('{{ field.name }}', 1)">+</button>
                         </div>
@@ -63,7 +63,7 @@ function changeStatValue(statId, delta) {
 }
 
 function updateTotalPoints() {
-    var totalPoints = {{ character.starting_stat_points }};
+    var totalPoints = {{ character.starting_stat_points }} + {{ extra_special_points }};
     var spentPoints = 0;
     var statFields = Array.from(document.querySelectorAll('input[type="number"]')).map(input => input.id);
 
