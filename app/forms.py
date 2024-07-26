@@ -86,12 +86,7 @@ class StatForm(FlaskForm):
 
 
 class PerkForm(FlaskForm):
-    perks = SelectMultipleField("Perks", coerce=int, validators=[DataRequired()])
     submit = SubmitField("Next")
-
-    def __init__(self, *args, **kwargs):
-        super(PerkForm, self).__init__(*args, **kwargs)
-        self.perks.choices = [(perk.id, perk.name) for perk in Perk.query.all()]
 
 
 class DeleteForm(FlaskForm):

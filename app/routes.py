@@ -185,27 +185,37 @@ def choose_stats(character_id):
     return render_template("choose_stats.html", form=form, character=character, stats=Stat.query.all(), carry_weight_base=carry_weight_base, carry_weight_trait=carry_weight_trait is not None, extra_special_points=extra_special_points)
 
 
-
 @app.route("/choose_perks/<int:character_id>", methods=["GET", "POST"])
 @login_required
 def choose_perks(character_id):
     character = Character.query.get_or_404(character_id)
     form = PerkForm()
 
+    # Calculate extra perks allowed
+    extra_perks = 0
+    traits = [trait.trait for trait in character.origin.origin_traits]
+    extra_perks_trait = next((trait for trait in traits if 'extra_perks' in trait.trait_data), None)
+    if extra_perks_trait:
+        extra_perks = extra_perks_trait.trait_data['extra_perks']
+
+    allowed_perks = 1 + extra_perks
+
     if form.validate_on_submit():
         selected_perks = request.form.getlist("perks")
-        for perk_id in selected_perks:
-            character_perk = CharacterPerk(
-                character_id=character.id,
-                perk_id=perk_id
-            )
-            db.session.add(character_perk)
-
-        db.session.commit()
-
-        return redirect(url_for("choose_skills", character_id=character.id))
+        if len(selected_perks) > allowed_perks:
+            flash(f"You can only select up to {allowed_perks} perks.", "danger")
+        else:
+            for perk_id in selected_perks:
+                character_perk = CharacterPerk(
+                    character_id=character.id,
+                    perk_id=perk_id
+                )
+                db.session.add(character_perk)
+            db.session.commit()
+            return redirect(url_for("choose_skills", character_id=character.id))
     
-    return render_template("choose_perks.html", form=form, character=character, perks=Perk.query.all())
+    return render_template("choose_perks.html", form=form, character=character, perks=Perk.query.all(), allowed_perks=allowed_perks)
+
 
 
 @app.route('/choose_skills/<int:character_id>', methods=['GET', 'POST'])
