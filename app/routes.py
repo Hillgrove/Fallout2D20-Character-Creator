@@ -150,16 +150,16 @@ def choose_stats(character_id):
     character = Character.query.get_or_404(character_id)
     form = StatForm(origin_id=character.origin_id)
     
-    # Fetch the traits related to the character's origin
-    traits = [trait.trait for trait in character.origin.origin_traits]
-    carry_weight_trait = next((trait for trait in traits if 'carry_weight' in trait.trait_data), None)
+    # Fetch the character's selected traits
+    selected_traits = [trait.trait for trait in character.character_traits]
+    carry_weight_trait = next((trait for trait in selected_traits if 'carry_weight' in trait.trait_data), None)
     
     carry_weight_base = 150
     extra_special_points = 0
     if carry_weight_trait:
         carry_weight_base = carry_weight_trait.trait_data['carry_weight']
     
-    extra_special_points_trait = next((trait for trait in traits if 'extra_special_points' in trait.trait_data), None)
+    extra_special_points_trait = next((trait for trait in selected_traits if 'extra_special_points' in trait.trait_data), None)
     if extra_special_points_trait:
         extra_special_points = extra_special_points_trait.trait_data['extra_special_points']
 
@@ -183,6 +183,7 @@ def choose_stats(character_id):
             flash("An error occurred while saving your stats. Please try again.", "danger")
 
     return render_template("choose_stats.html", form=form, character=character, stats=Stat.query.all(), carry_weight_base=carry_weight_base, carry_weight_trait=carry_weight_trait is not None, extra_special_points=extra_special_points)
+
 
 
 @app.route("/choose_perks/<int:character_id>", methods=["GET", "POST"])
