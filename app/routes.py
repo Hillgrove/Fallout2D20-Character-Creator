@@ -185,7 +185,6 @@ def choose_stats(character_id):
     return render_template("choose_stats.html", form=form, character=character, stats=Stat.query.all(), carry_weight_base=carry_weight_base, carry_weight_trait=carry_weight_trait is not None, extra_special_points=extra_special_points)
 
 
-
 @app.route("/choose_perks/<int:character_id>", methods=["GET", "POST"])
 @login_required
 def choose_perks(character_id):
@@ -216,7 +215,6 @@ def choose_perks(character_id):
             return redirect(url_for("choose_skills", character_id=character.id))
     
     return render_template("choose_perks.html", form=form, character=character, perks=Perk.query.all(), allowed_perks=allowed_perks)
-
 
 
 @app.route('/choose_skills/<int:character_id>', methods=['GET', 'POST'])
@@ -281,11 +279,11 @@ def character_overview(character_id):
     # Fetching only selected traits
     character_traits = CharacterTrait.query.filter_by(character_id=character.id).all()
 
-    return render_template("character_overview.html", 
-                           character=character, 
-                           character_stats=character_stats, 
-                           character_skill_attributes=character_skill_attributes, 
-                           character_perks=character_perks, 
-                           character_traits=character_traits)
+    return render_template("character_overview.html",
+                            character=character, 
+                            character_stats=character_stats, 
+                            character_skill_attributes=character_skill_attributes, 
+                            character_perks=character_perks, 
+                            character_traits=character_traits)
 
 
