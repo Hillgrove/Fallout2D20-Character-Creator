@@ -285,5 +285,3 @@ def character_overview(character_id):
                             character_skill_attributes=character_skill_attributes, 
                             character_perks=character_perks, 
                             character_traits=character_traits)
-
-
