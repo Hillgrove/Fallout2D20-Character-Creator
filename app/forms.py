@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import  BooleanField, IntegerField, PasswordField, SelectField, SelectMultipleField, StringField, SubmitField, widgets
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError, NumberRange
-from app.models import User, Origin, Perk
+from app.models import User, Origin
 
 
 class RegistrationForm(FlaskForm):
@@ -103,4 +103,3 @@ def DynamicSkillForm(skills):
         setattr(SkillForm, field_name, skill_field)
         setattr(SkillForm, f'tagged_{skill.id}', tagged_field)
     return SkillForm
-
