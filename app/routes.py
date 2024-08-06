@@ -221,12 +221,36 @@ def choose_perks(character_id):
 def choose_skills(character_id):
     skills = Skill.query.all()
     tagged_attribute = Attribute.query.filter_by(name='Tagged').first()
-    SkillForm = DynamicSkillForm(skills)
+    character = Character.query.get_or_404(character_id)
+    origin = character.origin
 
-    # Retrieve the intelligence stat value
+    # Default total points
     intelligence_stat = CharacterStat.query.filter_by(character_id=character_id, stat_id=Stat.query.filter_by(name="Intelligence").first().id).first()
     intelligence_value = intelligence_stat.value if intelligence_stat else 0
     total_points = 9 + intelligence_value
+
+    # Extra tag skills from traits
+    extra_tag_skills = 0
+    free_tag_skills = []
+
+    # Check traits chosen by the character
+    character_traits = {ct.trait_id: ct.trait for ct in character.character_traits}
+
+    for origin_trait in origin.origin_traits:
+        trait = origin_trait.trait
+        trait_data = trait.trait_data
+        if "extra_tag_skills" in trait_data:
+            extra_tag_skills += trait_data["extra_tag_skills"]
+        if "tag" in trait_data:
+            if trait.is_selectable:
+                if trait.id in character_traits:
+                    free_tag_skills.append(trait_data["tag"])
+            else:
+                free_tag_skills.append(trait_data["tag"])
+
+    max_tags = 3 + extra_tag_skills
+
+    SkillForm = DynamicSkillForm(skills)
 
     # Retrieve existing values from the database
     existing_values = {
@@ -245,12 +269,14 @@ def choose_skills(character_id):
             if existing_value:
                 form[skill_field_name].data = existing_value.value
                 form[tagged_field_name].data = existing_value.attribute_id == tagged_attribute.id
+            if skill.name in free_tag_skills:
+                form[tagged_field_name].data = True
 
     if form.validate_on_submit():
         tagged_count = sum(1 for skill in skills if getattr(form, f'tagged_{skill.id}').data)
         
-        if tagged_count > 3:
-            flash('You can only select up to 3 tags.', 'error')
+        if tagged_count > max_tags:
+            flash(f'You can only select up to {max_tags} tags.', 'error')
         else:
             spent_points = sum(getattr(form, f'skill_{skill.id}').data or 0 for skill in skills)
             if spent_points > total_points:
@@ -278,9 +304,7 @@ def choose_skills(character_id):
                 db.session.commit()
                 return redirect(url_for('character_overview', character_id=character_id))  # Ensure character_id is passed
 
-    return render_template('choose_skills.html', form=form, skills=skills, character_id=character_id, total_points=total_points)
-
-
+    return render_template('choose_skills.html', form=form, skills=skills, character_id=character_id, total_points=total_points, max_tags=max_tags, free_tag_skills=free_tag_skills)
 
 
 

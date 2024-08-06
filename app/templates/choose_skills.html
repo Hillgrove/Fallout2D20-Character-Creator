@@ -38,7 +38,7 @@
 
                     <!-- Tagged -->
                     <div class="col-md-3">
-                        {{ form['tagged_' ~ skill.id](class="form-check-input tagged-checkbox") }}
+                        {{ form['tagged_' ~ skill.id](class="form-check-input tagged-checkbox", disabled=(skill.name in free_tag_skills)) }}
                     </div>
 
                     <!-- Total Sum -->
@@ -51,7 +51,7 @@
         
         <!-- Counter for selectable tags -->
         <div id="selectable_tags_counter" class="text-muted mt-2">
-            0 / <span id="selectable_tags_limit">3</span> tags selected
+            0 / <span id="selectable_tags_limit">{{ max_tags }}</span> tags selected
         </div>
         
         <button type="submit" class="btn btn-primary" id="submit-button" disabled>Submit</button>
