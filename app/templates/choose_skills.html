@@ -27,11 +27,11 @@
                     <div class="col-md-3">
                         <div class="input-group">
                             <div class="input-group-prepend">
-                                <button type="button" class="btn btn-secondary" onclick="changeStatValue('{{ form['skill_' ~ skill.id].id }}', -1)">-</button>
+                                <button type="button" class="btn btn-secondary decrement-btn" onclick="changeStatValue('{{ form['skill_' ~ skill.id].id }}', -1)">-</button>
                             </div>
                             <input type="number" name="{{ form['skill_' ~ skill.id].name }}" id="{{ form['skill_' ~ skill.id].id }}" class="form-control text-center rank-input" value="{{ form['skill_' ~ skill.id].data or 0 }}" min="0" max="3" readonly>
                             <div class="input-group-append">
-                                <button type="button" class="btn btn-secondary" onclick="changeStatValue('{{ form['skill_' ~ skill.id].id }}', 1)">+</button>
+                                <button type="button" class="btn btn-secondary increment-btn" onclick="changeStatValue('{{ form['skill_' ~ skill.id].id }}', 1)">+</button>
                             </div>
                         </div>
                     </div>
@@ -149,12 +149,34 @@ document.addEventListener('DOMContentLoaded', function () {
             const decrementButton = skillField.parentElement.querySelector('.decrement-btn');
             const value = parseInt(skillField.value) || 0;
 
+            // Dim the increase button if the total sum is 3
             if (incrementButton) {
-                incrementButton.disabled = remainingPoints <= 0 || value >= 3;
+                incrementButton.disabled = value >= 3;
+                if (value >= 3) {
+                    incrementButton.classList.add('disabled');
+                } else {
+                    incrementButton.classList.remove('disabled');
+                }
             }
 
+            // Dim the decrease button if the value is 0
             if (decrementButton) {
                 decrementButton.disabled = value <= 0;
+                if (value <= 0) {
+                    decrementButton.classList.add('disabled');
+                } else {
+                    decrementButton.classList.remove('disabled');
+                }
+            }
+
+            // Dim all increase buttons if max points are used
+            if (incrementButton) {
+                incrementButton.disabled = remainingPoints <= 0 || value >= 3;
+                if (remainingPoints <= 0) {
+                    incrementButton.classList.add('disabled');
+                } else {
+                    incrementButton.classList.remove('disabled');
+                }
             }
 
             const skillRow = skillField.closest('.skill-row');
