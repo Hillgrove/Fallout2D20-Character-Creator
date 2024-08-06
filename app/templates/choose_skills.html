@@ -27,11 +27,11 @@
                     <div class="col-md-3">
                         <div class="input-group">
                             <div class="input-group-prepend">
-                                <button type="button" class="btn btn-secondary decrement-btn" onclick="changeStatValue('{{ form['skill_' ~ skill.id].id }}', -1)">-</button>
+                                <button type="button" class="btn btn-secondary decrement-btn" data-input-id="{{ form['skill_' ~ skill.id].id }}">-</button>
                             </div>
                             <input type="number" name="{{ form['skill_' ~ skill.id].name }}" id="{{ form['skill_' ~ skill.id].id }}" class="form-control text-center rank-input" value="{{ form['skill_' ~ skill.id].data or 0 }}" min="0" max="3" readonly>
                             <div class="input-group-append">
-                                <button type="button" class="btn btn-secondary increment-btn" onclick="changeStatValue('{{ form['skill_' ~ skill.id].id }}', 1)">+</button>
+                                <button type="button" class="btn btn-secondary increment-btn" data-input-id="{{ form['skill_' ~ skill.id].id }}">+</button>
                             </div>
                         </div>
                     </div>
@@ -73,7 +73,6 @@ document.addEventListener('DOMContentLoaded', function () {
         skillFields.forEach(function(skillField) {
             const value = parseInt(skillField.value) || 0;
             spentPoints += value;
-            console.log(`Skill field value for ${skillField.id}:`, value);
         });
         return spentPoints;
     }
@@ -82,13 +81,19 @@ document.addEventListener('DOMContentLoaded', function () {
         const input = document.getElementById(inputId);
         let currentValue = parseInt(input.value) || 0;
 
+        console.log(`Initial value of ${inputId}: ${currentValue}, delta: ${delta}`);
+
         // Calculate the new value
         let newValue = currentValue + delta;
         if (newValue < 0) newValue = 0;
         if (newValue > 3) newValue = 3;
 
+        console.log(`Updating value of ${inputId} from ${currentValue} to ${newValue} with delta ${delta}`);
+
         // Calculate the spent points if this change is applied
-        const spentPoints = calculateSpentPoints() - currentValue + newValue;
+        let spentPoints = calculateSpentPoints() - currentValue + newValue;
+
+        console.log(`Spent points before applying new value: ${spentPoints}`);
 
         // Check if the new value exceeds the total points
         if (spentPoints > totalPoints) {
@@ -97,8 +102,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         input.value = newValue;
-
-        console.log(`Updating value of ${inputId} to ${newValue}`);
 
         const skillRow = input.closest('.skill-row');
         updateTotal(skillRow);
@@ -112,9 +115,19 @@ document.addEventListener('DOMContentLoaded', function () {
         const totalSpan = document.getElementById('total_' + skillId);
         
         let total = parseInt(rankInput.value) || 0;
+        let adjustment = 0;
+
         if (taggedCheckbox && taggedCheckbox.checked) {
             total += 2;
+            if (total > 3) {
+                adjustment = total - 3;
+                rankInput.value = parseInt(rankInput.value) - adjustment;
+                total = 3;
+                updateTotalPoints();
+            }
         }
+
+        console.log(`Updating total for skill ${skillId} to ${total}`);
 
         totalSpan.textContent = total;
     }
@@ -143,16 +156,24 @@ document.addEventListener('DOMContentLoaded', function () {
         const remainingPoints = totalPoints - spentPoints;
         totalPointsElement.textContent = remainingPoints;
 
+        console.log(`Total Points: ${totalPoints}`);
+        console.log(`Spent Points: ${spentPoints}`);
+        console.log(`Remaining Points: ${remainingPoints}`);
+
         const skillFields = document.querySelectorAll('.rank-input');
         skillFields.forEach(function(skillField) {
             const incrementButton = skillField.parentElement.querySelector('.increment-btn');
             const decrementButton = skillField.parentElement.querySelector('.decrement-btn');
             const value = parseInt(skillField.value) || 0;
+            const totalSpan = skillField.closest('.skill-row').querySelector('span[id^="total_"]');
+            const total = parseInt(totalSpan.textContent) || 0;
 
-            // Dim the increase button if the total sum is 3
+            console.log(`Skill ${skillField.id} has value ${value} and total ${total}`);
+
+            // Dim the increase button if the total sum is 3 or if no remaining points
             if (incrementButton) {
-                incrementButton.disabled = value >= 3;
-                if (value >= 3) {
+                incrementButton.disabled = total >= 3 || remainingPoints <= 0;
+                if (total >= 3 || remainingPoints <= 0) {
                     incrementButton.classList.add('disabled');
                 } else {
                     incrementButton.classList.remove('disabled');
@@ -168,43 +189,23 @@ document.addEventListener('DOMContentLoaded', function () {
                     decrementButton.classList.remove('disabled');
                 }
             }
-
-            // Dim all increase buttons if max points are used
-            if (incrementButton) {
-                incrementButton.disabled = remainingPoints <= 0 || value >= 3;
-                if (remainingPoints <= 0) {
-                    incrementButton.classList.add('disabled');
-                } else {
-                    incrementButton.classList.remove('disabled');
-                }
-            }
-
-            const skillRow = skillField.closest('.skill-row');
-            updateTotal(skillRow);
         });
 
         updateTagsCounter();
-
-        console.log('Total Points:', totalPoints);
-        console.log('Spent Points:', spentPoints);
-        console.log('Remaining Points:', remainingPoints);
     }
 
-    document.querySelectorAll('.rank-input').forEach(input => {
-        const incrementButton = input.parentElement.querySelector('.increment-btn');
-        const decrementButton = input.parentElement.querySelector('.decrement-btn');
+    document.querySelectorAll('.increment-btn').forEach(button => {
+        button.addEventListener('click', function (event) {
+            event.preventDefault();
+            changeStatValue(this.getAttribute('data-input-id'), 1);
+        });
+    });
 
-        if (incrementButton) {
-            incrementButton.addEventListener('click', function () {
-                changeStatValue(input.id, 1);
-            });
-        }
-
-        if (decrementButton) {
-            decrementButton.addEventListener('click', function () {
-                changeStatValue(input.id, -1);
-            });
-        }
+    document.querySelectorAll('.decrement-btn').forEach(button => {
+        button.addEventListener('click', function (event) {
+            event.preventDefault();
+            changeStatValue(this.getAttribute('data-input-id'), -1);
+        });
     });
 
     taggedCheckboxes.forEach(checkbox => {
@@ -212,6 +213,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const skillRow = checkbox.closest('.skill-row');
             updateTotal(skillRow);
             updateTagsCounter();
+            updateTotalPoints();  // Recalculate total points to undim buttons if needed
         });
     });
 
