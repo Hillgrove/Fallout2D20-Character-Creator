@@ -273,7 +273,7 @@ def choose_skills(character_id):
                 form[tagged_field_name].data = True
 
     if form.validate_on_submit():
-        tagged_count = sum(1 for skill in skills if getattr(form, f'tagged_{skill.id}').data)
+        tagged_count = sum(1 for skill in skills if getattr(form, f'tagged_{skill.id}').data and skill.name not in free_tag_skills)
         
         if tagged_count > max_tags:
             flash(f'You can only select up to {max_tags} tags.', 'error')
@@ -302,9 +302,12 @@ def choose_skills(character_id):
                             new_skill_attr.attribute_id = tagged_attribute.id
                         db.session.add(new_skill_attr)
                 db.session.commit()
-                return redirect(url_for('character_overview', character_id=character_id))  # Ensure character_id is passed
+                return redirect(url_for('character_overview', character_id=character_id))
 
     return render_template('choose_skills.html', form=form, skills=skills, character_id=character_id, total_points=total_points, max_tags=max_tags, free_tag_skills=free_tag_skills)
+
+
+
 
 
 
