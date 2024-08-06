@@ -47,13 +47,23 @@
                 </div>
             {% endfor %}
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        
+        <!-- Counter for selectable tags -->
+        <div id="selectable_tags_counter" class="text-muted mt-2">
+            0 / <span id="selectable_tags_limit">3</span> tags selected
+        </div>
+        
+        <button type="submit" class="btn btn-primary" id="submit-button">Submit</button>
     </form>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const formGroup = document.querySelector('.form-group');
+    const taggedCheckboxes = document.querySelectorAll('.tagged-checkbox');
+    const selectableTagsCounter = document.getElementById('selectable_tags_counter');
+    const selectableTagsLimit = parseInt(document.getElementById('selectable_tags_limit').textContent);
+    const submitButton = document.getElementById('submit-button');
 
     function updateTotal(skillRow) {
         const skillId = skillRow.getAttribute('data-skill-id');
@@ -69,12 +79,31 @@ document.addEventListener('DOMContentLoaded', function () {
         totalSpan.textContent = total;
     }
 
+    function updateTagsCounter() {
+        const selectedTags = document.querySelectorAll('.tagged-checkbox:checked').length;
+        selectableTagsCounter.innerHTML = `${selectedTags} / ${selectableTagsLimit} tags selected`;
+
+        taggedCheckboxes.forEach(checkbox => {
+            if (selectedTags >= selectableTagsLimit && !checkbox.checked) {
+                checkbox.disabled = true;
+            } else {
+                checkbox.disabled = false;
+            }
+        });
+
+        submitButton.disabled = selectedTags !== selectableTagsLimit;
+    }
+
     formGroup.addEventListener('input', function (event) {
         if (event.target.classList.contains('rank-input') || event.target.classList.contains('tagged-checkbox')) {
             const skillRow = event.target.closest('.skill-row');
             updateTotal(skillRow);
+            updateTagsCounter();
         }
     });
+
+    // Initialize the counter on page load
+    updateTagsCounter();
 });
 
 function changeStatValue(inputId, delta) {
