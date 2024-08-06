@@ -223,6 +223,11 @@ def choose_skills(character_id):
     tagged_attribute = Attribute.query.filter_by(name='Tagged').first()
     SkillForm = DynamicSkillForm(skills)
 
+    # Retrieve the intelligence stat value
+    intelligence_stat = CharacterStat.query.filter_by(character_id=character_id, stat_id=Stat.query.filter_by(name="Intelligence").first().id).first()
+    intelligence_value = intelligence_stat.value if intelligence_stat else 0
+    total_points = 9 + intelligence_value
+
     # Retrieve existing values from the database
     existing_values = {
         skill.id: CharacterSkillAttribute.query.filter_by(character_id=character_id, skill_id=skill.id).first()
@@ -247,29 +252,35 @@ def choose_skills(character_id):
         if tagged_count > 3:
             flash('You can only select up to 3 tags.', 'error')
         else:
-            for skill in skills:
-                skill_field_name = f'skill_{skill.id}'
-                tagged_field_name = f'tagged_{skill.id}'
-                skill_value = getattr(form, skill_field_name).data or 0  # Default to 0 if empty
-                is_tagged = getattr(form, tagged_field_name).data
+            spent_points = sum(getattr(form, f'skill_{skill.id}').data or 0 for skill in skills)
+            if spent_points > total_points:
+                flash('You have exceeded the allowed skill points.', 'error')
+            else:
+                for skill in skills:
+                    skill_field_name = f'skill_{skill.id}'
+                    tagged_field_name = f'tagged_{skill.id}'
+                    skill_value = getattr(form, skill_field_name).data or 0  # Default to 0 if empty
+                    is_tagged = getattr(form, tagged_field_name).data
 
-                character_skill_attr = CharacterSkillAttribute.query.filter_by(character_id=character_id, skill_id=skill.id).first()
-                if character_skill_attr:
-                    character_skill_attr.value = skill_value
-                    if is_tagged:
-                        character_skill_attr.attribute_id = tagged_attribute.id
+                    character_skill_attr = CharacterSkillAttribute.query.filter_by(character_id=character_id, skill_id=skill.id).first()
+                    if character_skill_attr:
+                        character_skill_attr.value = skill_value
+                        if is_tagged:
+                            character_skill_attr.attribute_id = tagged_attribute.id
+                        else:
+                            if character_skill_attr.attribute_id == tagged_attribute.id:
+                                character_skill_attr.attribute_id = None
                     else:
-                        if character_skill_attr.attribute_id == tagged_attribute.id:
-                            character_skill_attr.attribute_id = None
-                else:
-                    new_skill_attr = CharacterSkillAttribute(character_id=character_id, skill_id=skill.id, value=skill_value)
-                    if is_tagged:
-                        new_skill_attr.attribute_id = tagged_attribute.id
-                    db.session.add(new_skill_attr)
-            db.session.commit()
-            return redirect(url_for('character_overview', character_id=character_id))  # Ensure character_id is passed
+                        new_skill_attr = CharacterSkillAttribute(character_id=character_id, skill_id=skill.id, value=skill_value)
+                        if is_tagged:
+                            new_skill_attr.attribute_id = tagged_attribute.id
+                        db.session.add(new_skill_attr)
+                db.session.commit()
+                return redirect(url_for('character_overview', character_id=character_id))  # Ensure character_id is passed
 
-    return render_template('choose_skills.html', form=form, skills=skills, character_id=character_id)
+    return render_template('choose_skills.html', form=form, skills=skills, character_id=character_id, total_points=total_points)
+
+
 
 
 
