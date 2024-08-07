@@ -13,23 +13,21 @@
         {% for field in form %}
             {% if field.name != 'csrf_token' and field.type == 'IntegerField' %}
             <div class="form-group row">
-
                 <!-- Label -->
                 <label class="col-sm-2 col-form-label">{{ field.label.text }}</label>
-                
+
                 <!-- Input field w. buttons -->
                 <div class="col-sm-3">
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <button type="button" class="btn btn-secondary" onclick="changeStatValue('{{ field.name }}', -1)">-</button>
                         </div>
-                        <input type="number" name="{{ field.name }}" id="{{ field.name }}" class="form-control text-center" value="{{ field.data or 4 }}" min="{{ field.validators[-1].min }}" max="{{ field.validators[-1].max }}" readonly>
+                        <input type="number" name="{{ field.name }}" id="{{ field.name }}" class="form-control text-center" value="{{ field.data or 4 }}" min="4" max="{{ field.validators[-1].max }}" readonly>
                         <div class="input-group-append">
                             <button type="button" class="btn btn-secondary" onclick="changeStatValue('{{ field.name }}', 1)">+</button>
                         </div>
                     </div>
                 </div>
-
             </div>
             {% endif %}
         {% endfor %}
@@ -46,13 +44,14 @@
         <p>Defense: <span id="defense"></span></p>
         <p>Hitpoints: <span id="hitpoints"></span></p>
         <p>Melee Damage: <span id="melee_damage"></span></p>
+        <p>Skill Points: <span id="skill_points"></span></p>
     </div>
 </div>
 
 <script>
 function changeStatValue(statId, delta) {
     var input = document.getElementById(statId);
-    var min = parseInt(input.min);
+    var min = 4; // Set the minimum value to 4
     var max = parseInt(input.max);
     var value = parseInt(input.value) + delta;
 
@@ -83,7 +82,7 @@ function updateTotalPoints() {
             var value = parseInt(input.value);
 
             document.querySelector(`button[onclick="changeStatValue('${statField}', 1)"]`).disabled = remainingPoints <= 0 || value >= parseInt(input.max);
-            document.querySelector(`button[onclick="changeStatValue('${statField}', -1)"]`).disabled = value <= parseInt(input.min);
+            document.querySelector(`button[onclick="changeStatValue('${statField}', -1)"]`).disabled = value <= 4; // Ensure the minimum value is 4
         }
     });
 
@@ -96,6 +95,7 @@ function updateDerivedStats() {
     var endurance = parseInt(document.getElementById('endurance').value);
     var agility = parseInt(document.getElementById('agility').value);
     var luck = parseInt(document.getElementById('luck').value);
+    var intelligence = parseInt(document.getElementById('intelligence').value);
     
     var carryWeight = {{ carry_weight_base }} + (strength * 10);
     if ({{ carry_weight_trait|tojson }}) {
@@ -121,6 +121,9 @@ function updateDerivedStats() {
         meleeDamage = 1;
     }
     document.getElementById('melee_damage').innerText = meleeDamage;
+
+    var skillPoints = 9 + intelligence;
+    document.getElementById('skill_points').innerText = skillPoints;
 }
 
 updateTotalPoints();
