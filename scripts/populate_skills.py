@@ -26,39 +26,24 @@ def add_skills(skills):
 
 if __name__ == "__main__":
     skills = [
-        {"name": "Athletics", "description": "Physical fitness and agility."},
-        {"name": "Barter", "description": "Negotiating and trading skills."},
-        {"name": "Energy Weapons", "description": "Use of energy-based weapons."},
-        {"name": "Explosives", "description": "Handling and deploying explosives."},
-        {"name": "Guns", "description": "Proficiency with conventional firearms."},
-        {"name": "Lockpick", "description": "Ability to pick locks."},
-        {"name": "Medicine", "description": "Medical knowledge and healing."},
-        {"name": "Melee Weapons", "description": "Proficiency with melee weapons."},
-        {"name": "Repair", "description": "Repairing and maintaining equipment."},
-        {"name": "Science", "description": "Scientific knowledge and research."},
-        {"name": "Sneak", "description": "Ability to move quietly and remain unseen."},
-        {"name": "Speech", "description": "Persuasion and communication skills."},
-        {"name": "Survival", "description": "Wilderness survival skills."},
+        {"name": "Athletics", "description": "Lifting, pushing, pulling, jumping, running, and swimming"},
+        {"name": "Barter", "description": "Buying and selling"},
+        {"name": "Big Guns", "description": "Using heavy weapons such as miniguns, Fat Mans, and gatling lasers"},
+        {"name": "Energy Weapons", "description": "Using energy weapons such as laser guns, and plasma guns"},
+        {"name": "Explosives", "description": "Blowing things up, or stopping them from doing that"},
+        {"name": "Lockpick", "description": "Opening locks without the key"},        
+        {"name": "Medicine", "description": "Healing people and stabilizing the dying"},
+        {"name": "Melee Weapons", "description": "Fighting people with bats, clubs, knives, boards, wrenches, and sledges"},
+        {"name": "Pilot", "description": "Flying and driving"},
+        {"name": "Repair", "description": "Fixing stuff, crafting things, and building machines"},
+        {"name": "Small Guns", "description": "Shooting people with pistols, rifles, and shotguns"},
+        {"name": "Science", "description": "Hacking, programming, and brewing chems"},
+        {"name": "Sneak", "description": "Moving quietly and staying hidden"},
+        {"name": "Speech", "description": "Making friends, influencing people, and lying to them if you have to"},
+        {"name": "Survival", "description": "Foraging, hunting, cooking, and enduring the wastes"},
+        {"name": "Throwing", "description": "Launching weapons from your hands, like spears or knives"},
         {"name": "Unarmed", "description": "Hand-to-hand combat skills."}
     ]
-
-    # Athletics STR Lifting, pushing, pulling, jumping, running, and swimming
-    # Barter CHA Buying and selling
-    # Big Guns END Using heavy weapons such as miniguns, Fat Mans, and gatling lasers
-    # Energy Weapons PER Using energy weapons such as laser guns, and plasma guns
-    # Explosives PER Blowing things up, or stopping them from doing that
-    # Lockpick PER Opening locks without the key
-    # Medicine INT Healing people and stabilizing the dying
-    # Melee Weapons STR Fighting people with bats, clubs, knives, boards, wrenches, and sledges
-    # Pilot PER Flying and driving
-    # Repair INT Fixing stuff, crafting things, and building machines
-    # Science INT Hacking, programming, and brewing chems
-    # Small Guns AGI Shooting people with pistols, rifles, and shotguns
-    # Sneak AGI Moving quietly and staying hidden
-    # Speech CHA Making friends, influencing people, and lying to them if you have to
-    # Survival END Foraging, hunting, cooking, and enduring the wastes
-    # Throwing AGI Launching weapons from your hands, like spears or knives
-    # Unarmed STR Fighting without a weapon by making unarmed attacks
 
     try:
         add_skills(skills)
