@@ -44,8 +44,11 @@ class Stat(db.Model):
     name = db.Column(db.String, nullable=False, unique=True)
     description = db.Column(db.Text, nullable=False)
     
-    # Relationship to CharacterStat
+    # Relationships
     character_stats = db.relationship("CharacterStat", back_populates='stat')
+    perk_stat_1 = db.relationship("Perk", foreign_keys="[Perk.stat_1_id]", back_populates='stat_1')
+    perk_stat_2 = db.relationship("Perk", foreign_keys="[Perk.stat_2_id]", back_populates='stat_2')
+
 
 
 class CharacterStat(db.Model):
@@ -150,14 +153,17 @@ class Perk(db.Model):
     __tablename__ = "perk"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String, nullable=False, unique=True)
+    stat_1_id = db.Column(db.Integer, db.ForeignKey('stat.id'), nullable=True)
+    amount_1 = db.Column(db.Integer, nullable=True)
+    stat_2_id = db.Column(db.Integer, db.ForeignKey('stat.id'), nullable=True)
+    amount_2 = db.Column(db.Integer, nullable=True)
+    mutual_exclusive = db.Column(db.String, nullable=True)
     description = db.Column(db.Text, nullable=False)
-    series_name = db.Column(db.String)
-    perk_rank = db.Column(db.Integer, default=0)
-
+    
     # Relationships
+    stat_1 = db.relationship("Stat", foreign_keys=[stat_1_id])
+    stat_2 = db.relationship("Stat", foreign_keys=[stat_2_id])
     character_perks = db.relationship("CharacterPerk", back_populates='perk')
-    prerequisites = db.relationship("PerkPrerequisite", foreign_keys='PerkPrerequisite.perk_id', back_populates='perk')
-    required_for = db.relationship("PerkPrerequisite", foreign_keys='PerkPrerequisite.required_perk_id', back_populates='required_perk')
 
 
 class CharacterPerk(db.Model):
@@ -170,17 +176,3 @@ class CharacterPerk(db.Model):
     perk = db.relationship("Perk", back_populates='character_perks')
 
     __table_args__ = (db.UniqueConstraint('character_id', 'perk_id', name='_character_perk_uc'),)
-
-
-class PerkPrerequisite(db.Model):
-    __tablename__ = "perk_prerequisite"
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    perk_id = db.Column(db.Integer, db.ForeignKey("perk.id"), nullable=False)
-    required_level = db.Column(db.Integer, nullable=False, default=0)
-    required_stat = db.Column(db.String, nullable=False)
-    required_stat_value = db.Column(db.Integer, nullable=False)
-    required_perk_id = db.Column(db.Integer, db.ForeignKey("perk.id"), nullable=False)
-
-    # Relationships
-    perk = db.relationship("Perk", foreign_keys=[perk_id], back_populates="prerequisites")
-    required_perk = db.relationship("Perk", foreign_keys=[required_perk_id], back_populates="required_for")
