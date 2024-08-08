@@ -50,7 +50,6 @@ class Stat(db.Model):
     perk_stat_2 = db.relationship("Perk", foreign_keys="[Perk.stat_2_id]", back_populates='stat_2')
 
 
-
 class CharacterStat(db.Model):
     __tablename__ = "character_stat"
     character_id = db.Column(db.Integer, db.ForeignKey("character.id"), primary_key=True)

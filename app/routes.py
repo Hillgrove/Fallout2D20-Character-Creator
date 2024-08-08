@@ -213,9 +213,10 @@ def choose_perks(character_id):
                 db.session.add(character_perk)
             db.session.commit()
             return redirect(url_for("choose_skills", character_id=character.id))
-    
-    return render_template("choose_perks.html", form=form, character=character, perks=Perk.query.all(), allowed_perks=allowed_perks)
 
+    perks = [perk for perk in Perk.query.all() if meets_stat_requirements(character, perk)]
+    
+    return render_template("choose_perks.html", form=form, character=character, perks=perks, allowed_perks=allowed_perks)
 
 
 @app.route('/choose_skills/<int:character_id>', methods=['GET', 'POST'])
@@ -357,3 +358,12 @@ def character_overview(character_id):
                             character_skill_attributes=character_skill_attributes, 
                             character_perks=character_perks, 
                             character_traits=character_traits)
+
+# Helper Functions
+def meets_stat_requirements(character, perk):
+    character_stats = {stat.stat.name: stat.value for stat in character.character_stats}
+    if perk.stat_1 and character_stats.get(perk.stat_1.name, 0) < perk.amount_1:
+        return False
+    if perk.stat_2 and character_stats.get(perk.stat_2.name, 0) < perk.amount_2:
+        return False
+    return True
