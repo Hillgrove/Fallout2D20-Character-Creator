@@ -6,8 +6,14 @@
     <form method="POST" action="{{ url_for('choose_skills', character_id=character_id) }}">
         {{ form.hidden_tag() }}
 
+        <!-- Counter for points remaining -->
         <div class="form-group">
-            <label>Total Points Available: <span id="total_points">{{ total_points }}</span></label>
+            <label>Total Points spent: <span id="points_spent">0</span> / <span id="points_total">{{ total_points }}</span></label>
+        </div>
+
+        <!-- Counter for selectable tags -->
+        <div class="form-group">
+            <label>Total Tags Selected: <span id="tags_selected">0</span> / <span id="tags_limit">{{ max_tags }}</span></label>
         </div>
 
         <div class="form-group">
@@ -47,26 +53,22 @@
                     </div>
                 </div>
             {% endfor %}
-        </div>
-        
-        <!-- Counter for selectable tags -->
-        <div id="selectable_tags_counter" class="text-muted mt-2">
-            0 / <span id="selectable_tags_limit">{{ max_tags }}</span> tags selected
-        </div>
-        
+        </div>        
         <button type="submit" class="btn btn-primary" id="submit-button" disabled>Submit</button>
     </form>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const totalPointsElement = document.getElementById('total_points');
-    const selectableTagsCounter = document.getElementById('selectable_tags_counter');
-    const selectableTagsLimit = parseInt(document.getElementById('selectable_tags_limit').textContent);
+    const pointsSpentElement = document.getElementById('points_spent');
+    const pointsTotalElement = document.getElementById('points_total');
+    const tagsSelectedElement = document.getElementById('tags_selected');
+    const tagsLimitElement = document.getElementById('tags_limit');
     const submitButton = document.getElementById('submit-button');
     const taggedCheckboxes = document.querySelectorAll('.tagged-checkbox');
     const freeTagSkills = {{ free_tag_skills|tojson }};
-    let totalPoints = parseInt(totalPointsElement.textContent);
+    let totalPoints = parseInt(pointsTotalElement.textContent);
+    let maxTags = parseInt(tagsLimitElement.textContent);
 
     function calculateSpentPoints() {
         let spentPoints = 0;
@@ -76,6 +78,11 @@ document.addEventListener('DOMContentLoaded', function () {
             spentPoints += value;
         });
         return spentPoints;
+    }
+
+    function calculateSelectedTags() {
+        const selectedTags = Array.from(document.querySelectorAll('.tagged-checkbox:checked')).filter(checkbox => !freeTagSkills.includes(checkbox.closest('.skill-row').querySelector('.col-md-3').textContent)).length;
+        return selectedTags;
     }
 
     window.changeStatValue = function(inputId, delta) {
@@ -99,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const skillRow = input.closest('.skill-row');
         updateTotal(skillRow);
-        updateTotalPoints();
+        updateCounters();
     };
 
     function updateTotal(skillRow) {
@@ -108,44 +115,44 @@ document.addEventListener('DOMContentLoaded', function () {
         const taggedCheckbox = skillRow.querySelector('.tagged-checkbox');
         const totalSpan = document.getElementById('total_' + skillId);
         
-        let total = parseInt(rankInput.value) || 0;
-        let adjustment = 0;
+        let basePoints = parseInt(rankInput.value) || 0;
+        let total = basePoints;
 
         if (taggedCheckbox && taggedCheckbox.checked) {
             total += 2;
             if (total > 3) {
-                adjustment = total - 3;
-                rankInput.value = parseInt(rankInput.value) - adjustment;
+                // Adjust the base points if the total exceeds 3
+                basePoints = 3 - 2; // Ensure that total doesn't exceed 3
+                rankInput.value = basePoints;
                 total = 3;
-                updateTotalPoints();
             }
         }
 
         totalSpan.textContent = total;
     }
 
-    function updateTagsCounter() {
-        const selectedTags = Array.from(document.querySelectorAll('.tagged-checkbox:checked')).filter(checkbox => !freeTagSkills.includes(checkbox.closest('.skill-row').querySelector('.col-md-3').textContent)).length;
-        selectableTagsCounter.innerHTML = `${selectedTags} / ${selectableTagsLimit} tags selected`;
+    function updateCounters() {
+        const spentPoints = calculateSpentPoints();
+        const selectedTags = calculateSelectedTags();
 
-        taggedCheckboxes.forEach(checkbox => {
-            const skillName = checkbox.closest('.skill-row').querySelector('.col-md-3').textContent;
-            if (selectedTags >= selectableTagsLimit && !checkbox.checked && !freeTagSkills.includes(skillName)) {
-                checkbox.disabled = true;
-            } else if (!freeTagSkills.includes(skillName)) {
-                checkbox.disabled = false;
-            }
-        });
+        // Update the counters
+        pointsSpentElement.textContent = spentPoints;
+        tagsSelectedElement.textContent = selectedTags;
 
-        const remainingPoints = parseInt(totalPointsElement.textContent);
-        submitButton.disabled = selectedTags > selectableTagsLimit || remainingPoints < 0;
+        // Ensure the submit button is enabled only when all points and tags are spent
+        const allPointsSpent = spentPoints === totalPoints;
+        const allTagsSpent = selectedTags === maxTags;
+        submitButton.disabled = !allPointsSpent || !allTagsSpent;
+
+        // Adjust button states for increment/decrement
+        updateButtonStates(spentPoints);
+
+        // Disable checkboxes if the tag limit is reached
+        updateTagCheckboxes(selectedTags);
     }
 
-    function updateTotalPoints() {
-        let spentPoints = calculateSpentPoints();
+    function updateButtonStates(spentPoints) {
         const remainingPoints = totalPoints - spentPoints;
-        totalPointsElement.textContent = remainingPoints;
-
         const skillFields = document.querySelectorAll('.rank-input');
         skillFields.forEach(function(skillField) {
             const incrementButton = skillField.parentElement.querySelector('.increment-btn');
@@ -157,25 +164,26 @@ document.addEventListener('DOMContentLoaded', function () {
             // Dim the increase button if the total sum is 3 or if no remaining points
             if (incrementButton) {
                 incrementButton.disabled = total >= 3 || remainingPoints <= 0;
-                if (total >= 3 || remainingPoints <= 0) {
-                    incrementButton.classList.add('disabled');
-                } else {
-                    incrementButton.classList.remove('disabled');
-                }
+                incrementButton.classList.toggle('disabled', incrementButton.disabled);
             }
 
             // Dim the decrease button if the value is 0
             if (decrementButton) {
                 decrementButton.disabled = value <= 0;
-                if (value <= 0) {
-                    decrementButton.classList.add('disabled');
-                } else {
-                    decrementButton.classList.remove('disabled');
-                }
+                decrementButton.classList.toggle('disabled', decrementButton.disabled);
             }
         });
+    }
 
-        updateTagsCounter();
+    function updateTagCheckboxes(selectedTags) {
+        taggedCheckboxes.forEach(checkbox => {
+            const skillName = checkbox.closest('.skill-row').querySelector('.col-md-3').textContent;
+            if (selectedTags >= maxTags && !checkbox.checked && !freeTagSkills.includes(skillName)) {
+                checkbox.disabled = true;
+            } else if (!freeTagSkills.includes(skillName)) {
+                checkbox.disabled = false;
+            }
+        });
     }
 
     document.querySelectorAll('.increment-btn').forEach(button => {
@@ -196,13 +204,13 @@ document.addEventListener('DOMContentLoaded', function () {
         checkbox.addEventListener('change', function() {
             const skillRow = checkbox.closest('.skill-row');
             updateTotal(skillRow);
-            updateTagsCounter();
-            updateTotalPoints();  // Recalculate total points to undim buttons if needed
+            updateCounters();
         });
     });
 
-    // Initialize the counter on page load
-    updateTotalPoints();
+    // Initialize the counters on page load
+    updateCounters();
 });
+
 </script>
 {% endblock %}

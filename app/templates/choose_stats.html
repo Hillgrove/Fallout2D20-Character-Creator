@@ -32,8 +32,9 @@
             {% endif %}
         {% endfor %}
 
+        <!-- Next button -->
         <div class="form-group">
-            {{ form.submit(class="btn btn-primary") }}
+            {{ form.submit(class="btn btn-primary", id="submit-button") }}
         </div>
     </form>
 
@@ -49,84 +50,92 @@
 </div>
 
 <script>
-function changeStatValue(statId, delta) {
-    var input = document.getElementById(statId);
-    var min = 4; // Set the minimum value to 4
-    var max = parseInt(input.max);
-    var value = parseInt(input.value) + delta;
+    function changeStatValue(statId, delta) {
+        var input = document.getElementById(statId);
+        var min = 4; // Set the minimum value to 4
+        var max = parseInt(input.max);
+        var value = parseInt(input.value) + delta;
 
-    if (value >= min && value <= max) {
-        input.value = value;
-        updateTotalPoints();
+        if (value >= min && value <= max) {
+            input.value = value;
+            updateTotalPoints();
+            updateDerivedStats();  // Ensure derived stats are updated on every change
+        }
     }
-}
 
-function updateTotalPoints() {
-    var totalPoints = {{ character.starting_stat_points }} + {{ extra_special_points }};
-    var spentPoints = 0;
-    var statFields = Array.from(document.querySelectorAll('input[type="number"]')).map(input => input.id);
+    function updateTotalPoints() {
+        var totalPoints = {{ character.starting_stat_points }} + {{ extra_special_points }};
+        var spentPoints = 0;
+        var statFields = Array.from(document.querySelectorAll('input[type="number"]')).map(input => input.id);
 
-    statFields.forEach(function(statField) {
-        var input = document.getElementById(statField);
-        if (input) {
-            spentPoints += parseInt(input.value);
+        statFields.forEach(function(statField) {
+            var input = document.getElementById(statField);
+            if (input) {
+                spentPoints += parseInt(input.value);
+            }
+        });
+
+        var remainingPoints = totalPoints - spentPoints;
+        document.getElementById('total_points').innerText = remainingPoints;
+
+        statFields.forEach(function(statField) {
+            var input = document.getElementById(statField);
+            if (input) {
+                var value = parseInt(input.value);
+
+                document.querySelector(`button[onclick="changeStatValue('${statField}', 1)"]`).disabled = remainingPoints <= 0 || value >= parseInt(input.max);
+                document.querySelector(`button[onclick="changeStatValue('${statField}', -1)"]`).disabled = value <= 4; // Ensure the minimum value is 4
+            }
+        });
+
+        // Enable or disable the submit button based on remaining points
+        var submitButton = document.getElementById('submit-button');
+        submitButton.disabled = remainingPoints !== 0;
+    }
+
+    function updateDerivedStats() {
+        // Make sure we have the latest values from the inputs
+        var strength = parseInt(document.getElementById('strength').value);
+        var perception = parseInt(document.getElementById('perception').value);
+        var endurance = parseInt(document.getElementById('endurance').value);
+        var agility = parseInt(document.getElementById('agility').value);
+        var luck = parseInt(document.getElementById('luck').value);
+        var intelligence = parseInt(document.getElementById('intelligence').value);
+
+        // Derived stats calculations remain unchanged
+        var carryWeight = {{ carry_weight_base }} + (strength * 10);
+        if ({{ carry_weight_trait|tojson }}) {
+            carryWeight = {{ carry_weight_base }};
         }
-    });
+        document.getElementById('carry_weight').innerText = carryWeight;
 
-    var remainingPoints = totalPoints - spentPoints;
-    document.getElementById('total_points').innerText = remainingPoints;
+        var initiative = perception + agility;
+        document.getElementById('initiative').innerText = initiative;
 
-    statFields.forEach(function(statField) {
-        var input = document.getElementById(statField);
-        if (input) {
-            var value = parseInt(input.value);
+        var defense = agility >= 9 ? 2 : 1;
+        document.getElementById('defense').innerText = defense;
 
-            document.querySelector(`button[onclick="changeStatValue('${statField}', 1)"]`).disabled = remainingPoints <= 0 || value >= parseInt(input.max);
-            document.querySelector(`button[onclick="changeStatValue('${statField}', -1)"]`).disabled = value <= 4; // Ensure the minimum value is 4
+        var hitpoints = endurance + luck;
+        document.getElementById('hitpoints').innerText = hitpoints;
+
+        var meleeDamage = 0;
+        if (strength >= 11) {
+            meleeDamage = 3;
+        } else if (strength >= 9) {
+            meleeDamage = 2;
+        } else if (strength >= 7) {
+            meleeDamage = 1;
         }
-    });
+        document.getElementById('melee_damage').innerText = meleeDamage;
 
+        var skillPoints = 9 + intelligence;
+        document.getElementById('skill_points').innerText = skillPoints;
+    }
+
+    // Initialize the page correctly on load
+    document.getElementById('submit-button').disabled = true;
+    updateTotalPoints();
     updateDerivedStats();
-}
-
-function updateDerivedStats() {
-    var strength = parseInt(document.getElementById('strength').value);
-    var perception = parseInt(document.getElementById('perception').value);
-    var endurance = parseInt(document.getElementById('endurance').value);
-    var agility = parseInt(document.getElementById('agility').value);
-    var luck = parseInt(document.getElementById('luck').value);
-    var intelligence = parseInt(document.getElementById('intelligence').value);
-    
-    var carryWeight = {{ carry_weight_base }} + (strength * 10);
-    if ({{ carry_weight_trait|tojson }}) {
-        carryWeight = {{ carry_weight_base }};
-    }
-    document.getElementById('carry_weight').innerText = carryWeight;
-
-    var initiative = perception + agility;
-    document.getElementById('initiative').innerText = initiative;
-
-    var defense = agility >= 9 ? 2 : 1;
-    document.getElementById('defense').innerText = defense;
-
-    var hitpoints = endurance + luck;
-    document.getElementById('hitpoints').innerText = hitpoints;
-
-    var meleeDamage = 0;
-    if (strength >= 11) {
-        meleeDamage = 3;
-    } else if (strength >= 9) {
-        meleeDamage = 2;
-    } else if (strength >= 7) {
-        meleeDamage = 1;
-    }
-    document.getElementById('melee_damage').innerText = meleeDamage;
-
-    var skillPoints = 9 + intelligence;
-    document.getElementById('skill_points').innerText = skillPoints;
-}
-
-updateTotalPoints();
 </script>
 
 {% endblock %}
