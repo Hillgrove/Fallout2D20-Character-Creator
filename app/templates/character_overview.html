@@ -40,17 +40,18 @@
             {% for skill in character_skill_attributes %}
             <tr>
                 <td>{{ skill.skill.name }}</td>
-                <td>{{ '✓' if skill.attribute_id else '' }}</td>
-                <td>{{ skill.value + 2 if skill.attribute_id else skill.value }}</td>
+                <td>{{ '✓' if skill.is_tagged else '' }}</td>
+                <td>{{ skill.value + 2 if skill.is_tagged else skill.value }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 
+
     <h2>Traits</h2>
     <ul>
         {% for trait in character_traits %}
-        <li><strong>{{ trait.trait.name }}:</strong> {{ trait.trait.description }}</li>
+        <li><strong>{{ trait.name }}:</strong> {{ trait.description }}</li>
         {% endfor %}
     </ul>
 

@@ -3,7 +3,7 @@ from flask import render_template, redirect, request, url_for, flash, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
 from app import app, db
 from app.forms import RegistrationForm, LoginForm, BackgroundForm, StatForm, PerkForm, DeleteForm, DynamicSkillForm
-from app.models import User, Character, Stat, CharacterStat, Perk, CharacterPerk, Skill, Origin, CharacterSkillAttribute, Attribute, CharacterTrait
+from app.models import User, Character, Stat, CharacterStat, Perk, CharacterPerk, Skill, Origin, CharacterSkillAttribute, Attribute, CharacterTrait, Trait, OriginTrait
 from werkzeug.security import generate_password_hash, check_password_hash
 import logging
 
@@ -345,19 +345,53 @@ def choose_skills(character_id):
 def character_overview(character_id):
     character = Character.query.get_or_404(character_id)
 
+    # Fetch the manually selected traits (including non-selectable)
+    character_traits = db.session.query(Trait).join(CharacterTrait).filter(
+        CharacterTrait.character_id == character.id).all()
+
+    # Fetch the traits associated with the character's origin (non-selectable)
+    origin_traits = db.session.query(Trait).join(OriginTrait).filter(
+        OriginTrait.origin_id == character.origin_id).all()
+
+    # Combine both sets of traits, ensuring no duplicates
+    all_traits = {trait.id: trait for trait in character_traits}  # Use a dictionary to prevent duplicates
+    for origin_trait in origin_traits:
+        if origin_trait.id not in all_traits:
+            all_traits[origin_trait.id] = origin_trait
+
+    # Filter the all_traits to only include non-selectable traits and chosen selectable traits
+    final_traits = [trait for trait in all_traits.values() if not trait.is_selectable or trait in character_traits]
+
+    # Fetch other necessary data
     character_stats = CharacterStat.query.filter_by(character_id=character.id).all()
     character_skill_attributes = CharacterSkillAttribute.query.filter_by(character_id=character.id).all()
     character_perks = CharacterPerk.query.filter_by(character_id=character.id).all()
-    
-    # Fetching only selected traits
-    character_traits = CharacterTrait.query.filter_by(character_id=character.id).all()
+
+    # Initialize a set to track tagged skills
+    tagged_skills = set()
+
+    # Add manually tagged skills
+    for skill_attr in character_skill_attributes:
+        if skill_attr.attribute_id:  # Assuming attribute_id indicates the skill is tagged
+            tagged_skills.add(skill_attr.skill.name)
+
+    # Add free tagged skills from traits
+    for trait in final_traits:
+        if 'tag' in trait.trait_data:
+            tagged_skills.add(trait.trait_data['tag'])
+
+    # Update the character skills with tagging information
+    for skill_attr in character_skill_attributes:
+        skill_attr.is_tagged = skill_attr.skill.name in tagged_skills
 
     return render_template("character_overview.html",
-                            character=character, 
-                            character_stats=character_stats, 
-                            character_skill_attributes=character_skill_attributes, 
-                            character_perks=character_perks, 
-                            character_traits=character_traits)
+                           character=character, 
+                           character_stats=character_stats, 
+                           character_skill_attributes=character_skill_attributes, 
+                           character_perks=character_perks, 
+                           character_traits=final_traits)
+
+
 
 # Helper Functions
 def meets_stat_requirements(character, perk):
