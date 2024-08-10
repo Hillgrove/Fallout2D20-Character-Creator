@@ -58,7 +58,13 @@
 
         <!-- Selectable Trait section -->
         <div class="form-group row" id="selectable_traits_section" style="display: none;">
-            <label class="col-sm-3 col-form-label">{{ form.selectable_traits.label.text }}</label>
+            <label class="col-sm-3 col-form-label font-weight-bold">{{ form.selectable_traits.label.text }}</label>
+
+            <!-- Counter for selectable traits -->
+            <div class="form-group mt-2">
+                <label class="ml-3">Total Tags Selected: <span id="tags_selected">0</span> / <span id="tags_limit">{{ max_tags }}</span></label>
+            </div>
+
             <div class="col-sm-9">
                 <div id="selectable_traits">
                     {% for subfield in form.selectable_traits %}
@@ -69,10 +75,8 @@
                     {% endfor %}
                 </div>
 
-                <!-- Counter for selectable traits -->
-                <div id="selectable_traits_counter" class="text-muted">
-                    0 / <span id="selectable_traits_limit">0</span> traits selected
-                </div>
+
+
             </div>
         </div>
 
@@ -106,8 +110,6 @@ document.addEventListener('DOMContentLoaded', function() {
         var nonSelectableTraitsSection = document.getElementById('non_selectable_traits_section');
         var selectedTraitsDescriptionsSection = document.getElementById('selected_traits_descriptions_section');
         var form = document.getElementById('create-character-form');
-        var traitsCounter = document.getElementById('selectable_traits_counter');
-        var traitsLimitSpan = document.getElementById('selectable_traits_limit');
         var submitButton = document.getElementById('submit-button');
 
         if (originId == -1) {
@@ -122,7 +124,6 @@ document.addEventListener('DOMContentLoaded', function() {
             selectableTraitsSection.style.display = 'none';
             nonSelectableTraitsSection.style.display = 'none';
             selectedTraitsDescriptionsSection.style.display = 'none';
-            traitsCounter.style.display = 'none';
             submitButton.disabled = true;
 
             return;
@@ -138,7 +139,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 backgroundDescriptionSection.style.display = 'block';
                 selectableTraitsSection.style.display = data.selectable_traits.length > 0 ? 'block' : 'none';
                 nonSelectableTraitsSection.style.display = data.non_selectable_traits.length > 0 ? 'block' : 'none';
-                traitsCounter.style.display = data.selectable_traits.length > 0 ? 'block' : 'none';
                 selectedTraitsDescriptionsSection.style.display = 'block';
                 submitButton.disabled = data.selectable_traits.length > 0;
 
@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     traitsDiv.appendChild(div);
 
-                    checkbox.addEventListener('change', updateTraitsCounter);
+                    checkbox.addEventListener('change', updateTagsCounter);
                     checkbox.addEventListener('change', updateTraitsDescriptions);
                 });
 
@@ -206,28 +206,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 form.setAttribute('data-trait-limit', data.selectable_traits_limit);
-                if (traitsLimitSpan) {
-                    traitsLimitSpan.innerText = data.selectable_traits_limit;
-                }
-                updateTraitsCounter();
+                document.getElementById('tags_limit').innerText = data.selectable_traits_limit; // Corrected
+                updateTagsCounter();
                 updateTraitsDescriptions();
             });
     });
 
-    function updateTraitsCounter() {
+    function updateTagsCounter() {  // Updated function name
         var form = document.getElementById('create-character-form');
-        var traitLimit = parseInt(form.getAttribute('data-trait-limit'), 10);
-        var selectedTraits = document.querySelectorAll('input[name="selectable_traits"]:checked').length;
-        var counter = document.getElementById('selectable_traits_counter');
+        var tagLimit = parseInt(form.getAttribute('data-trait-limit'), 10);  // Updated
+        var selectedTags = document.querySelectorAll('input[name="selectable_traits"]:checked').length;  // Updated
+        var counter = document.getElementById('tags_selected');  // Updated
         var submitButton = document.getElementById('submit-button');
 
-        if (counter) {
-            counter.innerHTML = selectedTraits + ' / ' + traitLimit + ' traits selected';
-        }
+        counter.innerHTML = selectedTags;  // Corrected
 
         var checkboxes = document.querySelectorAll('input[name="selectable_traits"]');
         checkboxes.forEach(function(checkbox) {
-            if (selectedTraits >= traitLimit) {
+            if (selectedTags >= tagLimit) {  // Updated
                 if (!checkbox.checked) {
                     checkbox.disabled = true;
                 }
@@ -236,11 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        if (selectedTraits == traitLimit) {
-            submitButton.disabled = false;
-        } else {
-            submitButton.disabled = true;
-        }
+        submitButton.disabled = selectedTags !== tagLimit;  // Simplified logic
     }
 
     function updateTraitsDescriptions() {
@@ -259,6 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
 </script>
 
 {% endblock %}
