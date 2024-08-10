@@ -20,7 +20,7 @@
             <div class="row mb-3">
                 <div class="col-md-3"><strong>Skill</strong></div>
                 <div class="col-md-3"><strong>Rank</strong></div>
-                <div class="col-md-3"><strong>Tagged</strong></div>
+                <div class="col-md-2 text-center"><strong>Tagged</strong></div> <!-- Centered title -->
                 <div class="col-md-3"><strong>Total</strong></div>
             </div>
             {% for skill in skills %}
@@ -43,8 +43,8 @@
                     </div>
 
                     <!-- Tagged -->
-                    <div class="col-md-3">
-                        {{ form['tagged_' ~ skill.id](class="form-check-input tagged-checkbox", disabled=(skill.name in free_tag_skills)) }}
+                    <div class="col-md-2 d-flex justify-content-center align-items-center">
+                        {{ form['tagged_' ~ skill.id](class="form-check-input tagged-checkbox custom-checkbox") }}
                     </div>
 
                     <!-- Total Sum -->
@@ -57,6 +57,13 @@
         <button type="submit" class="btn btn-primary" id="submit-button" disabled>Submit</button>
     </form>
 </div>
+
+<style>
+    .custom-checkbox {
+        transform: scale(1.5); /* Adjust the scale value to make the checkbox bigger */
+        margin-right: 10px; /* Optional: adds space to the right of the checkbox */
+    }
+</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
