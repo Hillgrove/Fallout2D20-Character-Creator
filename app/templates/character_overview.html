@@ -3,64 +3,129 @@
 {% block content %}
 <div class="container">
     <h1>Character Overview: {{ character.name }}</h1>
-    
-    <h2>Basic Info</h2>
-    <p><strong>Name:</strong> {{ character.name }}</p>
-    <p><strong>Origin:</strong> {{ character.origin.name }}</p>
-    
-    <h2>S.P.E.C.I.A.L Stats</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Stat</th>
-                <th>Value</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for stat in character_stats %}
-            <tr>
-                <td>{{ stat.stat.name }}</td>
-                <td>{{ stat.value }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
 
-    <h2>Skills</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Skill</th>
-                <th>Tagged</th>
-                <th>Sum</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for skill in character_skill_attributes %}
-            <tr>
-                <td>{{ skill.skill.name }}</td>
-                <td>{{ '✓' if skill.is_tagged else '' }}</td>
-                <td>{{ skill.value + 2 if skill.is_tagged else skill.value }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="row">
+        <!-- Left Column: Basic Info and S.P.E.C.I.A.L Stats -->
+        <div class="col-md-6 mb-4">
+            <section>
+                <h2>Basic Info</h2>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-sm">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Name</th>
+                                <th>Origin</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ character.name }}</td>
+                                <td>{{ character.origin.name }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
 
+            <section class="mt-4">
+                <h2>S.P.E.C.I.A.L Stats</h2>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-sm">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Stat</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stat in character_stats %}
+                            <tr>
+                                <td>{{ stat.stat.name }}</td>
+                                <td>{{ stat.value }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
 
-    <h2>Traits</h2>
-    <ul>
-        {% for trait in character_traits %}
-        <li><strong>{{ trait.name }}:</strong> {{ trait.description }}</li>
-        {% endfor %}
-    </ul>
+        <!-- Right Column: Skills -->
+        <div class="col-md-6 mb-4">
+            <section>
+                <h2>Skills</h2>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-sm">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Skill</th>
+                                <th>Tagged</th>
+                                <th>Sum</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for skill in character_skill_attributes %}
+                            <tr>
+                                <td>{{ skill.skill.name }}</td>
+                                <td class="text-center">{{ '✓' if skill.is_tagged else '' }}</td>
+                                <td class="text-center">{{ skill.value + 2 if skill.is_tagged else skill.value }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
 
-    <h2>Perks</h2>
-    <ul>
-        {% for perk in character_perks %}
-        <li><strong>{{ perk.perk.name }}:</strong> {{ perk.perk.description }}</li>
-        {% endfor %}
-    </ul>
+    <!-- Full-Width Sections: Traits and Perks -->
+    <section class="mb-4">
+        <h2>Traits</h2>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-sm">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Trait</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for trait in character_traits %}
+                    <tr>
+                        <td>{{ trait.name }}</td>
+                        <td>{{ trait.description }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
 
-    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Back to Dashboard</a>
+    <section class="mb-4">
+        <h2>Perks</h2>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-sm">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Perk</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for perk in character_perks %}
+                    <tr>
+                        <td>{{ perk.perk.name }}</td>
+                        <td>{{ perk.perk.description }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <a href="{{ url_for('dashboard') }}" class="btn btn-primary mt-3">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
 </div>
+
 {% endblock %}
