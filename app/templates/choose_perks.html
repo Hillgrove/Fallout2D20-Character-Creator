@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container">
-    <h1>Choose Perks for {{ character.name }}</h1>
+    <h1>Choose Perks</h1>
     <form method="POST" action="{{ url_for('choose_perks', character_id=character.id) }}">
         {{ form.hidden_tag() }}
 

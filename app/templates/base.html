@@ -51,8 +51,9 @@
         </nav>
     </div>
 
-    <!-- Flashes -->
+    
     <div class="container">
+        <!-- Flashes -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -63,20 +64,15 @@
             {% endif %}
         {% endwith %}
 
-        {% block content %}
-        {% endblock %}
+        <!-- Block Content -->
+        <div class="mt-5">
+            {% block content %}
+            {% endblock %}
+        </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script>
-        // Enable scrollbar if content overflows
-        document.addEventListener('DOMContentLoaded', function() {
-            if (document.body.scrollHeight > window.innerHeight) {
-                document.body.style.overflowY = 'scroll';
-            }
-        });
-    </script>
 </body>
 </html>

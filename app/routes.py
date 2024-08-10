@@ -5,9 +5,6 @@ from app import app, db
 from app.forms import RegistrationForm, LoginForm, BackgroundForm, StatForm, PerkForm, DeleteForm, DynamicSkillForm
 from app.models import User, Character, Stat, CharacterStat, Perk, CharacterPerk, Skill, Origin, CharacterSkillAttribute, Attribute, CharacterTrait, Trait, OriginTrait
 from werkzeug.security import generate_password_hash, check_password_hash
-import logging
-
-logging.basicConfig(level=logging.INFO)
 
 @app.route("/")
 @app.route("/index")
@@ -179,7 +176,6 @@ def choose_stats(character_id):
                 return redirect(url_for("choose_perks", character_id=character.id))
         except Exception as e:
             db.session.rollback()
-            logging.error(f"Error saving stats: {e}")
             flash("An error occurred while saving your stats. Please try again.", "danger")
 
     return render_template("choose_stats.html", form=form, character=character, stats=Stat.query.all(), carry_weight_base=carry_weight_base, carry_weight_trait=carry_weight_trait is not None, extra_special_points=extra_special_points)
@@ -385,12 +381,11 @@ def character_overview(character_id):
         skill_attr.is_tagged = skill_attr.skill.name in tagged_skills
 
     return render_template("character_overview.html",
-                           character=character, 
-                           character_stats=character_stats, 
-                           character_skill_attributes=character_skill_attributes, 
-                           character_perks=character_perks, 
-                           character_traits=final_traits)
-
+                            character=character, 
+                            character_stats=character_stats, 
+                            character_skill_attributes=character_skill_attributes, 
+                            character_perks=character_perks, 
+                            character_traits=final_traits)
 
 
 # Helper Functions
