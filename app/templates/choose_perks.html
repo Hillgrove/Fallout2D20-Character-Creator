@@ -5,9 +5,18 @@
     <h1>Choose Perks for {{ character.name }}</h1>
     <form method="POST" action="{{ url_for('choose_perks', character_id=character.id) }}">
         {{ form.hidden_tag() }}
-        
+
         <div class="row">
+            <!-- Perks Column -->
             <div class="col-md-6">
+                <h2>Available Perks</h2>
+
+                <!-- Counter for selectable perks -->
+                <div id="selectable_perks_counter" class="mt-2 mb-2">
+                    0 / <span id="selectable_perks_limit">{{ allowed_perks }}</span> perks selected
+                </div>
+                
+                <!-- Perks -->
                 <div class="form-group">
                     <div id="perks">
                         {% for perk in perks %}
@@ -18,23 +27,22 @@
                             </div>
                         {% endfor %}
                     </div>
-
-                    <!-- Counter for selectable perks -->
-                    <div id="selectable_perks_counter" class="text-muted mt-2">
-                        0 / <span id="selectable_perks_limit">{{ allowed_perks }}</span> perks selected
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    {{ form.submit(class="btn btn-primary", id="submit-button", disabled=True) }}
                 </div>
             </div>
 
+            <!-- Descriptions Column -->
             <div class="col-md-6">
-                <h2>Selected Perk Descriptions</h2>
+                <h2>Description</h2>
                 <div id="selected_perk_descriptions">
                     <!-- Descriptions will be dynamically inserted here -->
                 </div>
+            </div>
+        </div>
+
+        <!-- Next button -->
+        <div class="form-group row">
+            <div class="col-sm-9">
+                {{ form.submit(class="btn btn-primary", id="submit-button", disabled=True) }}
             </div>
         </div>
     </form>

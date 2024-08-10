@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    
     <style>
         /* Ensure the scrollbar space is always reserved */
         html {
@@ -15,16 +16,22 @@
             overflow-y: hidden;
         }
     </style>
+
 </head>
+<!-- Body -->
 <body>
     <div class="container">
 
     <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
+
+            <!-- Home -->
             <a class="navbar-brand" href="{{ url_for('index') }}">Home</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
+
+            <!-- Access buttons -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
                     {% if current_user.is_authenticated %}
@@ -44,6 +51,7 @@
         </nav>
     </div>
 
+    <!-- Flashes -->
     <div class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}

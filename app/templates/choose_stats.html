@@ -6,23 +6,30 @@
     <form method="POST" action="{{ url_for('choose_stats', character_id=character.id) }}">
         {{ form.hidden_tag() }}
 
+        <!-- Stats counter -->
         <div class="form-group">
             <label>Total Points Available: <span id="total_points"></span></label>
         </div>
-
+        
+        <!-- Stats section -->
         {% for field in form %}
             {% if field.name != 'csrf_token' and field.type == 'IntegerField' %}
             <div class="form-group row">
-                <!-- Label -->
                 <label class="col-sm-2 col-form-label">{{ field.label.text }}</label>
 
                 <!-- Input field w. buttons -->
                 <div class="col-sm-3">
                     <div class="input-group">
+                        
+                        <!-- Minus button -->
                         <div class="input-group-prepend">
                             <button type="button" class="btn btn-secondary" onclick="changeStatValue('{{ field.name }}', -1)">-</button>
                         </div>
+
+                        <!-- Stat Value -->
                         <input type="number" name="{{ field.name }}" id="{{ field.name }}" class="form-control text-center" value="{{ field.data or 4 }}" min="4" max="{{ field.validators[-1].max }}" readonly>
+                        
+                        <!-- Plus button -->
                         <div class="input-group-append">
                             <button type="button" class="btn btn-secondary" onclick="changeStatValue('{{ field.name }}', 1)">+</button>
                         </div>
@@ -33,11 +40,14 @@
         {% endfor %}
 
         <!-- Next button -->
-        <div class="form-group">
-            {{ form.submit(class="btn btn-primary", id="submit-button") }}
+        <div class="form-group row">
+            <div class="col-sm-9">
+                {{ form.submit(class="btn btn-primary", id="submit-button") }}
+            </div>
         </div>
     </form>
 
+    <!-- Derived Stats Section -->
     <div class="mt-4">
         <h2>Derived Stats</h2>
         <p>Carry Weight: <span id="carry_weight"></span> lbs.</p>
@@ -50,92 +60,106 @@
 </div>
 
 <script>
-    function changeStatValue(statId, delta) {
-        var input = document.getElementById(statId);
-        var min = 4; // Set the minimum value to 4
-        var max = parseInt(input.max);
-        var value = parseInt(input.value) + delta;
+// Constants for minimum values and derived stats formulas
+const MIN_STAT_VALUE = 4;
+const MAX_STAT_VALUES = {
+    strength: {{ form.strength.validators[-1].max }},
+    perception: {{ form.perception.validators[-1].max }},
+    endurance: {{ form.endurance.validators[-1].max }},
+    charisma: {{ form.charisma.validators[-1].max }},
+    agility: {{ form.agility.validators[-1].max }},
+    luck: {{ form.luck.validators[-1].max }},
+    intelligence: {{ form.intelligence.validators[-1].max }}
+};
 
-        if (value >= min && value <= max) {
-            input.value = value;
-            updateTotalPoints();
-            updateDerivedStats();  // Ensure derived stats are updated on every change
-        }
-    }
-
-    function updateTotalPoints() {
-        var totalPoints = {{ character.starting_stat_points }} + {{ extra_special_points }};
-        var spentPoints = 0;
-        var statFields = Array.from(document.querySelectorAll('input[type="number"]')).map(input => input.id);
-
-        statFields.forEach(function(statField) {
-            var input = document.getElementById(statField);
-            if (input) {
-                spentPoints += parseInt(input.value);
-            }
-        });
-
-        var remainingPoints = totalPoints - spentPoints;
-        document.getElementById('total_points').innerText = remainingPoints;
-
-        statFields.forEach(function(statField) {
-            var input = document.getElementById(statField);
-            if (input) {
-                var value = parseInt(input.value);
-
-                document.querySelector(`button[onclick="changeStatValue('${statField}', 1)"]`).disabled = remainingPoints <= 0 || value >= parseInt(input.max);
-                document.querySelector(`button[onclick="changeStatValue('${statField}', -1)"]`).disabled = value <= 4; // Ensure the minimum value is 4
-            }
-        });
-
-        // Enable or disable the submit button based on remaining points
-        var submitButton = document.getElementById('submit-button');
-        submitButton.disabled = remainingPoints !== 0;
-    }
-
-    function updateDerivedStats() {
-        // Make sure we have the latest values from the inputs
-        var strength = parseInt(document.getElementById('strength').value);
-        var perception = parseInt(document.getElementById('perception').value);
-        var endurance = parseInt(document.getElementById('endurance').value);
-        var agility = parseInt(document.getElementById('agility').value);
-        var luck = parseInt(document.getElementById('luck').value);
-        var intelligence = parseInt(document.getElementById('intelligence').value);
-
-        // Derived stats calculations remain unchanged
-        var carryWeight = {{ carry_weight_base }} + (strength * 10);
-        if ({{ carry_weight_trait|tojson }}) {
-            carryWeight = {{ carry_weight_base }};
-        }
-        document.getElementById('carry_weight').innerText = carryWeight;
-
-        var initiative = perception + agility;
-        document.getElementById('initiative').innerText = initiative;
-
-        var defense = agility >= 9 ? 2 : 1;
-        document.getElementById('defense').innerText = defense;
-
-        var hitpoints = endurance + luck;
-        document.getElementById('hitpoints').innerText = hitpoints;
-
-        var meleeDamage = 0;
-        if (strength >= 11) {
-            meleeDamage = 3;
-        } else if (strength >= 9) {
-            meleeDamage = 2;
-        } else if (strength >= 7) {
-            meleeDamage = 1;
-        }
-        document.getElementById('melee_damage').innerText = meleeDamage;
-
-        var skillPoints = 9 + intelligence;
-        document.getElementById('skill_points').innerText = skillPoints;
-    }
-
-    // Initialize the page correctly on load
+document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('submit-button').disabled = true;
     updateTotalPoints();
     updateDerivedStats();
-</script>
+});
 
+// Function to change stat value and update UI
+function changeStatValue(statId, delta) {
+    const input = document.getElementById(statId);
+    const max = MAX_STAT_VALUES[statId];
+    const newValue = parseInt(input.value) + delta;
+
+    if (newValue >= MIN_STAT_VALUE && newValue <= max) {
+        input.value = newValue;
+        updateTotalPoints();
+        updateDerivedStats();
+    }
+}
+
+// Function to calculate remaining points and update buttons and submit state
+function updateTotalPoints() {
+    const totalPoints = {{ character.starting_stat_points }} + {{ extra_special_points }};
+    let spentPoints = calculateSpentPoints();
+    const remainingPoints = totalPoints - spentPoints;
+
+    document.getElementById('total_points').innerText = remainingPoints;
+    toggleButtons(remainingPoints);
+    toggleSubmitButton(remainingPoints);
+}
+
+// Helper function to calculate spent points
+function calculateSpentPoints() {
+    return Array.from(document.querySelectorAll('input[type="number"]')).reduce((acc, input) => {
+        return acc + parseInt(input.value);
+    }, 0);
+}
+
+// Helper function to toggle plus/minus buttons
+function toggleButtons(remainingPoints) {
+    Object.keys(MAX_STAT_VALUES).forEach(statId => {
+        const input = document.getElementById(statId);
+        const value = parseInt(input.value);
+
+        document.querySelector(`button[onclick="changeStatValue('${statId}', 1)"]`).disabled = remainingPoints <= 0 || value >= MAX_STAT_VALUES[statId];
+        document.querySelector(`button[onclick="changeStatValue('${statId}', -1)"]`).disabled = value <= MIN_STAT_VALUE;
+    });
+}
+
+// Helper function to enable/disable submit button
+function toggleSubmitButton(remainingPoints) {
+    document.getElementById('submit-button').disabled = remainingPoints !== 0;
+}
+
+// Function to update derived stats based on the current stat values
+function updateDerivedStats() {
+    const stats = getStatValues();
+    const derivedStats = calculateDerivedStats(stats);
+
+    document.getElementById('carry_weight').innerText = derivedStats.carryWeight;
+    document.getElementById('initiative').innerText = derivedStats.initiative;
+    document.getElementById('defense').innerText = derivedStats.defense;
+    document.getElementById('hitpoints').innerText = derivedStats.hitpoints;
+    document.getElementById('melee_damage').innerText = derivedStats.meleeDamage;
+    document.getElementById('skill_points').innerText = derivedStats.skillPoints;
+}
+
+// Helper function to get current stat values from inputs
+function getStatValues() {
+    return {
+        strength: parseInt(document.getElementById('strength').value),
+        perception: parseInt(document.getElementById('perception').value),
+        endurance: parseInt(document.getElementById('endurance').value),
+        agility: parseInt(document.getElementById('agility').value),
+        luck: parseInt(document.getElementById('luck').value),
+        intelligence: parseInt(document.getElementById('intelligence').value)
+    };
+}
+
+// Function to calculate derived stats
+function calculateDerivedStats({ strength, perception, endurance, agility, luck, intelligence }) {
+    return {
+        carryWeight: {{ carry_weight_base }} + (strength * 10) * ({{ carry_weight_trait|tojson }} ? 1 : 0),
+        initiative: perception + agility,
+        defense: agility >= 9 ? 2 : 1,
+        hitpoints: endurance + luck,
+        meleeDamage: strength >= 11 ? 3 : strength >= 9 ? 2 : strength >= 7 ? 1 : 0,
+        skillPoints: 9 + intelligence
+    };
+}
+</script>
 {% endblock %}
