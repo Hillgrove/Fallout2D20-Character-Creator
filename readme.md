@@ -1,4 +1,4 @@
-# Character Management System
+# Fallout 2D20 Character Creator
 
 **Video URL:** [Insert your video URL here]
 
@@ -6,26 +6,30 @@
 
 ## Project Description
 
-The Character Management System is a web-based application designed to assist users in managing and organizing character profiles, primarily aimed at RPG and tabletop gaming enthusiasts. The system allows users to create, update, and delete character profiles, while also providing detailed overviews of each character's attributes, such as basic information, stats, skills, traits, and perks. The project is built using Python and Flask, utilizing SQLAlchemy for database management, and Jinja2 for rendering dynamic HTML templates.
+The Character Creator is a web-based application designed to assist users in creating new characters for the Fallout 2D20 Tabletop Roleplaying Game. 
 
-## Project Overview
+The system allows users to create and delete characters, while also providing detailed overviews of each character's attributes, such as basic information, stats, skills, traits, and perks. 
 
-The primary goal of the Character Management System is to offer a streamlined and user-friendly interface for managing multiple characters with varying attributes. This application is particularly beneficial for game masters and players who need a reliable tool to keep track of complex character data across gaming sessions.
+The project is built using Python and Flask, utilizing SQLAlchemy and SQLite for database management, and Jinja2 for rendering dynamic HTML templates.
 
 ### Key Features
 
-1. **Character Creation and Management:**
-   - Users can create new characters by inputting their name, origin, and other attributes. Once created, these characters are stored in a relational database, allowing for persistent storage and retrieval.
-   - The dashboard provides a comprehensive view of all characters, enabling users to quickly access, update, or delete characters as needed.
+1. **Character Creation:**
+   - Users can create new characters by inputting their name, origin, and other attributes.
+   - The dashboard provides a comprehensive view of all characters, enabling users to quickly access or delete characters as needed.
+
+2. **Persistant data:**
+   - characters are stored in a relational database, allowing for persistent storage and retrieval.
 
 2. **Detailed Character Overview:**
-   - For each character, the system offers a detailed view that breaks down the character's stats, skills, traits, and perks. This overview is designed to be highly accessible, with information neatly organized into sections that are easy to navigate.
+   - For each character, the system offers a detailed view that breaks down the character's stats, skills, traits, and perks and their derived statistics.
 
 3. **Intuitive User Interface:**
-   - The application is designed with simplicity and ease of use in mind. The interface is clean, with clear navigation paths and minimal clutter, ensuring that users can focus on managing their characters without being overwhelmed by the interface.
+   - The application is designed with simplicity and ease of use in mind. The interface is clean, with clear navigation paths and minimal clutter.
+   - Interactive elements are designed with user experience in mind, such as dimming buttons and keeping them inactive until all necessary fields are completed.
 
 4. **Security and Data Integrity:**
-   - The system incorporates basic security measures such as CSRF protection and input validation to ensure that data remains secure and the application is protected from common vulnerabilities.
+   - The system incorporates essential security measures such as Flask-WTF for form handling, CSRF protection, and input validation to ensure that data remains secure and the application is protected from common vulnerabilities.
 
 ## Design Considerations
 
@@ -42,6 +46,72 @@ In designing the Character Management System, several key decisions were made to
 
 - **Template-Driven UI:**
   - The front-end of the application is powered by Jinja2 templates, which enable dynamic rendering of HTML based on the data stored in the database. This approach allows for a seamless integration between the back-end logic and the front-end presentation, ensuring that updates to character data are reflected in real-time.
+
+### Tech Stack
+ - Python
+    - Flask
+    - SQLAlchemy
+    - Jinja
+    - Werkzeug
+    - WTForms
+ - SQLite
+ - HTML
+ - CSS / Boostrap
+
+### Project Structure
+```
+|   .gitignore
+|   config.py
+|   readme.md
+|   requirements.txt
+|   run.py
+|   tree.txt
+|   
++---app
+|   |   forms.py
+|   |   models.py
+|   |   routes.py
+|   |   __init__.py
+|   |   
+|   +---templates
+|          base.html
+|          character_overview.html
+|          choose_origin.html
+|          choose_perks.html
+|          choose_skills.html
+|          choose_stats.html
+|          dashboard.html
+|          index.html
+|          login.html
+|          register.html
+|           
++---data
+|       perks.csv
+|       
++---instance
+|       app.db
+|       
++---scripts
+|       init_db.py
+|       populate_attributes.py
+|       populate_origins.py
+|       populate_perks.py
+|       populate_skills.py
+|       populate_stats.py
+|       populate_traits.py
+|       run_population_scripts.py
+```
+## Database Design
+![Class Diagram](./class%20diagram.png)
+
+## Backend
+### each file:
+
+
+## Frontend
+
+
+## Disclaimer
 
 ## Conclusion
 
