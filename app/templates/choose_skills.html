@@ -46,9 +46,14 @@
                     </div>
 
                     <!-- Tagged -->
-                    <div class="col-md-2 d-flex justify-content-center align-items-center">
+                    {# <div class="col-md-2 d-flex justify-content-center align-items-center">
                         {{ form['tagged_' ~ skill.id](class="form-check-input tagged-checkbox custom-checkbox") }}
+                    </div> #}
+
+                    <div class="col-md-2 d-flex justify-content-center align-items-center">
+                        {{ form['tagged_' ~ skill.id](class="form-check-input tagged-checkbox custom-checkbox", disabled="disabled" if skill.name in free_tag_skills else "") }}
                     </div>
+
 
                     <!-- Total Sum -->
                     <div class="col-md-3">
@@ -124,11 +129,15 @@ document.addEventListener('DOMContentLoaded', function () {
         const rankInput = skillRow.querySelector('.rank-input');
         const taggedCheckbox = skillRow.querySelector('.tagged-checkbox');
         const totalSpan = document.getElementById('total_' + skillId);
-        
+
         let basePoints = parseInt(rankInput.value) || 0;
         let total = basePoints;
 
-        if (taggedCheckbox && taggedCheckbox.checked) {
+        const skillName = skillRow.querySelector('.col-md-3').textContent;
+        const isFreeTagSkill = freeTagSkills.includes(skillName);
+
+        // If the skill is tagged or is a free-tagged skill, add 2 to the total
+        if (taggedCheckbox && (taggedCheckbox.checked || isFreeTagSkill)) {
             total += 2;
             if (total > 3) {
                 // Adjust the base points if the total exceeds 3
@@ -149,6 +158,9 @@ document.addEventListener('DOMContentLoaded', function () {
         pointsSpentElement.textContent = spentPoints;
         tagsSelectedElement.textContent = selectedTags;
 
+        // Update totals for all skill rows
+        document.querySelectorAll('.skill-row').forEach(updateTotal);
+
         // Ensure the submit button is enabled only when all points and tags are spent
         const allPointsSpent = spentPoints === totalPoints;
         const allTagsSpent = selectedTags === maxTags;
@@ -160,6 +172,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Disable checkboxes if the tag limit is reached
         updateTagCheckboxes(selectedTags);
     }
+
 
     function updateButtonStates(spentPoints) {
         const remainingPoints = totalPoints - spentPoints;
