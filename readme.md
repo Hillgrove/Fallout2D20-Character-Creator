@@ -31,22 +31,6 @@ The project is built using Python and Flask, utilizing SQLAlchemy and SQLite for
 4. **Security and Data Integrity:**
    - The system incorporates essential security measures such as Flask-WTF for form handling, CSRF protection, and input validation to ensure that data remains secure and the application is protected from common vulnerabilities.
 
-## Design Considerations
-
-In designing the Character Management System, several key decisions were made to ensure that the application is both functional and scalable:
-
-- **Modular Architecture:**
-  - The application is built using a modular architecture, which separates the core logic, database models, and templates into distinct components. This not only improves maintainability but also makes the system more flexible for future expansions or modifications.
-
-- **User-Centric Design:**
-  - The design of the application is heavily user-centric. From the dashboard that provides an at-a-glance view of all characters to the detailed character pages, every aspect of the system is designed to be intuitive and accessible. The layout and organization of information are structured to minimize the learning curve and enhance the overall user experience.
-
-- **Scalability:**
-  - The use of SQLAlchemy as the ORM layer allows the system to scale efficiently as the number of characters and their associated data grows. This was a critical consideration during development to ensure that the system could handle an increasing amount of data without degrading performance.
-
-- **Template-Driven UI:**
-  - The front-end of the application is powered by Jinja2 templates, which enable dynamic rendering of HTML based on the data stored in the database. This approach allows for a seamless integration between the back-end logic and the front-end presentation, ensuring that updates to character data are reflected in real-time.
-
 ### Tech Stack
  - Python
     - Flask
@@ -102,6 +86,22 @@ In designing the Character Management System, several key decisions were made to
 |       run_population_scripts.py
 ```
 
+<!-- ## Design Considerations
+
+In designing the Character Management System, several key decisions were made to ensure that the application is both functional and scalable:
+
+- **Modular Architecture:**
+  - The application is built using a modular architecture, which separates the core logic, database models, and templates into distinct components. This not only improves maintainability but also makes the system more flexible for future expansions or modifications.
+
+- **User-Centric Design:**
+  - The design of the application is heavily user-centric. From the dashboard that provides an at-a-glance view of all characters to the detailed character pages, every aspect of the system is designed to be intuitive and accessible. The layout and organization of information are structured to minimize the learning curve and enhance the overall user experience.
+
+- **Scalability:**
+  - The use of SQLAlchemy as the ORM layer allows the system to scale efficiently as the number of characters and their associated data grows. This was a critical consideration during development to ensure that the system could handle an increasing amount of data without degrading performance.
+
+- **Template-Driven UI:**
+  - The front-end of the application is powered by Jinja2 templates, which enable dynamic rendering of HTML based on the data stored in the database. This approach allows for a seamless integration between the back-end logic and the front-end presentation, ensuring that updates to character data are reflected in real-time. -->
+
 ## Installing and Running Web Application
 ### Cloning the Repository
 Follow these steps to clone the repository:
@@ -111,7 +111,7 @@ Follow these steps to clone the repository:
    git clone https://github.com/Hillgrove/Fallout2D20-Character-Creator.git
    ```
 
-### Installing Required Dependancies
+### Installing Required Dependencies
 Follow these steps to install the required dependencies (requires Python installed on the system):
 1. **Navigate to the Project Directory**: Open your terminal or command prompt and navigate to the directory where the `requirements.txt` file is located: `cd /path/to/your/project`.
 
@@ -148,7 +148,7 @@ Example:
 
 `Running on http://127.0.0.1:5000`
 
-Congratulations! You're now running your own local version of Fallout 2D20 Character Creator.
+Congratulations! You're now running your own local version of the **Fallout 2D20 Character Creator**.
 
 ## Database Design
 ![Class Diagram](./docs/class%20diagram.png)
