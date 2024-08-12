@@ -101,8 +101,64 @@ In designing the Character Management System, several key decisions were made to
 |       populate_traits.py
 |       run_population_scripts.py
 ```
+
+## Installing and Running Web Application
+### Cloning the Repository
+Follow these steps to clone the repository:
+
+1. **Clone the Repository**: Open your terminal or command prompt and clone the repository to your local machine using the following command:
+   ```bash
+   git clone https://github.com/Hillgrove/Fallout2D20-Character-Creator.git
+   ```
+
+### Installing Required Dependancies
+Follow these steps to install the required dependencies (requires Python installed on the system):
+1. **Navigate to the Project Directory**: Open your terminal or command prompt and navigate to the directory where the `requirements.txt` file is located: `cd /path/to/your/project`.
+
+2. **(Optional) Create and Activate a Virtual Environment**: It's recommended to create a virtual environment to keep dependencies isolated: `python -m venv venv`. 
+   - On Windows: `venv\Scripts\activate`
+   - On macOS/Linux: `source venv/bin/activate`
+
+4. **Install Dependencies**: Install the dependencies listed in `requirements.txt` using **pip**: `pip install -r requirements.txt`.
+
+After following these steps, all required packages will be installed and your environment will be ready for running the project.
+
+### Initializing Database and Data Populating
+1. **Navigate to the Project Directory**: Open your terminal or command prompt and navigate to the directory where `run.py` is located: `cd /path/to/your/project`.
+2. **Initialize Database**: Initialize the database by running the following command:
+```bash
+python.exe .\scripts\init_db.py
+```
+wait for successful confirmation of database initialization.
+
+3. **Populating Database**: Populate the database by running the following command:
+```bash
+python.exe .\scripts\run_population_scripts.py
+```
+wait for successful conformation of database population.
+
+### Running the Web Application
+1. **Running Application**: To open the application locally, run the following command:
+```bash
+python.exe .\run.py
+```
+2. **Opening the Application**: When running the application it will list which IP and port it runs on. Click on that to open the site in a new window.
+
+Example:
+
+`Running on http://127.0.0.1:5000`
+
+Congratulations! You're now running your own local version of Fallout 2D20 Character Creator.
+
 ## Database Design
-![Class Diagram](./class%20diagram.png)
+![Class Diagram](./docs/class%20diagram.png)
+
+The database is intended to be somewhat system agnostic (in terms of TTRPG rules), and it should be able to handle at least a few different rulesets.
+
+### A few of the interesting tables
+**User**: The table for anything related to your account and access to the application.
+**Character**: The character you've created
+**
 
 ## Backend
 ### each file:
@@ -116,3 +172,10 @@ In designing the Character Management System, several key decisions were made to
 ## Conclusion
 
 The Character Management System is a robust, user-friendly application tailored to the needs of RPG and tabletop gaming enthusiasts. It provides a comprehensive platform for managing character profiles, offering detailed insights into each character's attributes and making it easy to maintain and organize multiple characters. The project is built with scalability and maintainability in mind, ensuring that it can grow and adapt to meet the evolving needs of its users. The careful consideration given to user experience, security, and modularity makes this system not only functional but also a joy to use, standing as a valuable tool for any gaming setup.
+
+
+# MISC
+Csrf
+Flask login managerDashboard
+What will your software do? What features will it have? How will it be executed?
+how to install and run yourself
