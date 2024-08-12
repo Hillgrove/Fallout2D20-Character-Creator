@@ -156,9 +156,26 @@ Congratulations! You're now running your own local version of Fallout 2D20 Chara
 The database is intended to be somewhat system agnostic (in terms of TTRPG rules), and it should be able to handle at least a few different rulesets.
 
 ### A few of the interesting tables
-**User**: The table for anything related to your account and access to the application.
-**Character**: The character you've created
-**
+1. **user**: The table for anything related to your account and access to the application.
+2. **character**: The character you've created
+3. **origin**: A list of all the various origins / races / backgrounds you can choose (eg. Vault Dweller, Survivor etc). The field `selectable_traits_limit` is used for those origins that can choose from a list of traits an origin can have. 
+Some origins have fixed built-in traits, some needs to choose, and others again have both fixed and selectable traits.
+4. **trait**: All the various traits an origin can have. It holds all fixed and selectable traits. Special gamerules that breaks normal game logic, is saved in the `trait_data` JSON field. For example, normally all origins only have 1 perk point.
+The Survivor is able to choose a trait that gives them 1 more perk point, thus breaking the normal game logic, and the application needs to be aware of this.
+The JSON looks like this:
+```JSON
+{"name": "Extra Perk", "description": "1 more perk", "trait_data": {"extra_perks": 1}, "is_selectable": True}
+```
+*The backend will look for the __extra_perks__ data and add the number to the total number of perks. This JSON also shows how the selectable traits work in the database.*
+5. **origin_trait**: This is a junction table to allows for many-to-many to exist between origins and traits.
+6. **character_trait**: This is also a junction table. This is for the those traits that are '"is_selectable": True' and the character has chosen.
+7. **stat** and **character_stat**: For the various stats a character can have. In Fallout 2D20 this is the S.P.E.C.I.A.L stats (Strength, Perception, Endurance, Charisma, Intelligence, Agility and Luck)
+8. **skill**, **attribute** and **character_skill_attribute**: Tables for the various skills a character can have (eg. Athletics, Lockpick, Sneak etc). Attributes are special 'descriptors' for a skill. In Fallout 2D20 this attribute is called "Tagged". 
+The last table is a junction table to bind all together.
+9. **perk** and **character_perk**: Various perks a character can have (eg. Armorer. Night Person, Steady Aim etc)
+
+
+
 
 ## Backend
 ### each file:
