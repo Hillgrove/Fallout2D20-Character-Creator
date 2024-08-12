@@ -238,40 +238,24 @@ def choose_skills(character_id):
     # Check traits chosen by the character
     character_traits = {ct.trait_id: ct.trait for ct in character.character_traits}
 
-    # Debug: Initial state
-    print(f"Character ID: {character_id}")
-    print(f"Character Traits: {character_traits}")
-
     # Process origin traits (non-selectable traits)
     for origin_trait in origin.origin_traits:
         trait = origin_trait.trait
         trait_data = trait.trait_data
-        print(f"Processing Origin Trait: {trait.name}, Trait Data: {trait_data}")
         if "extra_tag_skills" in trait_data and not trait.is_selectable:
             extra_tag_skills += trait_data["extra_tag_skills"]
-            print(f"Added {trait_data['extra_tag_skills']} extra tag skills from non-selectable trait {trait.name}")
         if "tag" in trait_data and not trait.is_selectable:
             free_tag_skills.append(trait_data["tag"])
-            print(f"Added free tag skill {trait_data['tag']} from non-selectable trait {trait.name}")
 
     # Process selectable traits
     for trait_id, trait in character_traits.items():
         trait_data = trait.trait_data
-        print(f"Processing Selectable Trait: {trait.name}, Trait Data: {trait_data}")
         if "extra_tag_skills" in trait_data and trait.is_selectable:
             extra_tag_skills += trait_data["extra_tag_skills"]
-            print(f"Added {trait_data['extra_tag_skills']} extra tag skills from selectable trait {trait.name}")
         if "tag" in trait_data and trait.is_selectable:
             free_tag_skills.append(trait_data["tag"])
-            print(f"Added free tag skill {trait_data['tag']} from selectable trait {trait.name}")
 
     max_tags = 3 + extra_tag_skills
-
-    # Debug: Final computed values
-    print(f"Final Extra Tag Skills: {extra_tag_skills}")
-    print(f"Max Tags: {max_tags}")
-    print(f"Free Tag Skills: {free_tag_skills}")
-    print(f"Total Points: {total_points}")
 
     SkillForm = DynamicSkillForm(skills)
 
@@ -298,16 +282,10 @@ def choose_skills(character_id):
     if form.validate_on_submit():
         tagged_count = sum(1 for skill in skills if getattr(form, f'tagged_{skill.id}').data and skill.name not in free_tag_skills)
 
-        # Debug: Tagged skills selected
-        print(f"Tagged Count: {tagged_count}")
-
         if tagged_count > max_tags:
             flash(f'You can only select up to {max_tags} tags.', 'error')
         else:
             spent_points = sum(getattr(form, f'skill_{skill.id}').data or 0 for skill in skills)
-
-            # Debug: Total spent points
-            print(f"Spent Points: {spent_points}")
 
             if spent_points > total_points:
                 flash('You have exceeded the allowed skill points.', 'error')
@@ -317,10 +295,6 @@ def choose_skills(character_id):
                     tagged_field_name = f'tagged_{skill.id}'
                     skill_value = getattr(form, skill_field_name).data or 0  # Default to 0 if empty
                     is_tagged = getattr(form, tagged_field_name).data
-
-                    # Debug: Skill values being processed
-                    print(f"Processing Skill: {skill.name}, Value: {skill_value}, Is Tagged: {is_tagged}")
-
                     character_skill_attr = CharacterSkillAttribute.query.filter_by(character_id=character_id, skill_id=skill.id).first()
                     if character_skill_attr:
                         character_skill_attr.value = skill_value
