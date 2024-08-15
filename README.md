@@ -10,7 +10,7 @@ The Character Creator is a web-based application designed to assist users in cre
 
 The system allows users to create and delete characters, while also providing detailed overviews of each character's attributes, such as basic information, stats, skills, traits, and perks. 
 
-The project is built using Python and Flask, utilizing SQLAlchemy and SQLite for database management, and Jinja2 for rendering dynamic HTML templates.
+The project is built using Python and Flask. It uses SQLAlchemy for ORM and SQLite for database management. Jinja is employed for rendering dynamic HTML templates.
 
 ### Key Features
 
@@ -18,18 +18,18 @@ The project is built using Python and Flask, utilizing SQLAlchemy and SQLite for
    - Users can create new characters by inputting their name, origin, and other attributes.
    - The dashboard provides a comprehensive view of all characters, enabling users to quickly access or delete characters as needed.
 
-2. **Persistant data:**
-   - characters are stored in a relational database, allowing for persistent storage and retrieval.
+2. **Persistent Data:**
+   - Character data is stored persistently in a relational database, ensuring that user data remains consistent and retrievable across sessions.
 
 2. **Detailed Character Overview:**
    - For each character, the system offers a detailed view that breaks down the character's stats, skills, traits, and perks and their derived statistics.
 
 3. **Intuitive User Interface:**
    - The application is designed with simplicity and ease of use in mind. The interface is clean, with clear navigation paths and minimal clutter.
-   - Interactive elements are designed with user experience in mind, such as dimming buttons and keeping them inactive until all necessary fields are completed.
+   - Interactive elements are designed with user experience in mind, such as disabling buttons and keeping them inactive until all necessary fields are completed.
 
 4. **Security and Data Integrity:**
-   - The system incorporates essential security measures such as Flask-WTF for form handling, CSRF protection, and input validation to ensure that data remains secure and the application is protected from common vulnerabilities.
+   - The system incorporates essential security measures such as Flask-WTF for form handling, CSRF protection, and input validation to ensure that data remains secure and the application is protected from common vulnerabilities. CSRF protection helps prevent cross-site request forgery attacks by ensuring that form submissions come from trusted sources.
 
 ### Tech Stack
  - Python
@@ -40,24 +40,9 @@ The project is built using Python and Flask, utilizing SQLAlchemy and SQLite for
     - WTForms
  - SQLite
  - HTML
- - CSS / Boostrap
+ - CSS (Bootstrap)
 
-<!-- ## Design Considerations
-
-In designing the Character Management System, several key decisions were made to ensure that the application is both functional and scalable:
-
-- **Modular Architecture:**
-  - The application is built using a modular architecture, which separates the core logic, database models, and templates into distinct components. This not only improves maintainability but also makes the system more flexible for future expansions or modifications.
-
-- **User-Centric Design:**
-  - The design of the application is heavily user-centric. From the dashboard that provides an at-a-glance view of all characters to the detailed character pages, every aspect of the system is designed to be intuitive and accessible. The layout and organization of information are structured to minimize the learning curve and enhance the overall user experience.
-
-- **Scalability:**
-  - The use of SQLAlchemy as the ORM layer allows the system to scale efficiently as the number of characters and their associated data grows. This was a critical consideration during development to ensure that the system could handle an increasing amount of data without degrading performance.
-
-- **Template-Driven UI:**
-  - The front-end of the application is powered by Jinja2 templates, which enable dynamic rendering of HTML based on the data stored in the database. This approach allows for a seamless integration between the back-end logic and the front-end presentation, ensuring that updates to character data are reflected in real-time. -->
-
+<br><br>
 
 # Installing and Running Web Application
 ## Cloning the Repository
@@ -107,6 +92,8 @@ Example:
 
 Congratulations! You're now running your own local version of the **Fallout 2D20 Character Creator**.
 
+<br><br>
+
 # Database Design
 ![Class Diagram](./docs/class%20diagram.png)
 
@@ -131,6 +118,8 @@ The JSON looks like this:
 - **skill**, **attribute** and **character_skill_attribute**: Tables for the various skills a character can have (eg. Athletics, Lockpick, Sneak etc). Attributes are special 'descriptors' for a skill. In Fallout 2D20 this attribute is called "Tagged". 
 The last table is a junction table to bind all together.
 - **perk** and **character_perk**: Various perks a character can have (eg. Armorer. Night Person, Steady Aim etc)
+
+<br><br>
 
 # Files
 ## Project Structure
@@ -161,7 +150,12 @@ The last table is a junction table to bind all together.
 |          register.html
 |           
 +---data
+|       attributes.csv
+|       origins.csv
 |       perks.csv
+|       skills.csv
+|       stats.csv
+|       traits.csv
 |       
 +---instance
 |       app.db
@@ -179,49 +173,43 @@ The last table is a junction table to bind all together.
 
 ## File Overview
 ### Data Files
-- **perks.csv**:
-- **app.db**:
-- **init_db.py**:
-- **populate_*.py**:
-- **run_population_scripts.py**:
+- **Data CSV files**: Store essential data used in the character creation process. Each CSV file provides structured data that is used to populate the respective sections in the character creator.
+- **app.db**: SQLite database file taht stores persistent data for the web application, such as user-generated characters and any other data that needs to be retained across sessions. It acts as the main storage system for the app, enabling data retrieval and manipulation through SQL queries.
+- **init_db.py**: This script sets up the system path, initializes the Flask app, and creates the database schema. It logs the success or failure of the initialization process and is designed to be run as a standalone script to set up the database for the application.
+- **Population scripts**: These scripts are responsible for initializing the database and populating it with predefined data. They set up the essential data that the application requires for the character creation process.
+- **run_population_scripts.py**: This script sequentially executes a series of population scripts that populate the database with predefined data. It uses subprocess to run each script and logs the success or failure of each execution, ensuring that the scripts are run in the correct order and the data is properly initialized.
 
 ### Backend Files
-- **models.py**:
-- **forms.py**:
-- **routes.py**:
-- **config.py**:
-- **__init__.py**:
-- **run.py**:
+- **models.py**: This file defines the database models and relationships for the application's data structure. It uses SQLAlchemy to represent entities, manage relationships between them, and enforce constraints like cascading deletes and unique combinations of fields. These models serve as the foundation for the application's data management and interactions.
+- **forms.py**: Defines various forms used in the application, leveraging Flask-WTF and WTForms to manage user input and validation.
+- **routes.py**: Manages the application's URL routing and handles user interactions, including data processing and form submissions. It coordinates the application's flow and interactions, ensuring users are directed to the correct pages and that their inputs are handled appropriately.
+- **config.py**: This file defines configuration settings for the application, including secret keys and database URI. It allows for environment-based configuration with fallback default values.
+- **__init__.py**: Initializes the Flask application, configures extensions like SQLAlchemy, Flask-Login, and CSRF protection, and imports routes to register them with the app.
+- **run.py**: This file serves as the entry point for running the Flask application, launching it in debug mode. allowing for live code reloading and detailed error messages.
 
 
 ### Frontend Files
-- **base.html**:
-- **character_overview.html**:
-- **choose_origin.html**:
-- **choose_perks.html**:
-- **choose_skills.html**:
-- **choose_stats.html**:
-- **dashboard.html**:
-- **index.html**:
-- **login.html**:
-- **register.html**:
-
+- **base.html**: Provides the base HTML template for the web application, including a responsive layout with a Bootstrap navbar and dynamic content blocks. It also includes space for flashing messages and integrates essential JavaScript libraries for functionality.
+- **character_overview.html**: A detailed character overview page.
+- **choose_origin.html**: An origin selection page.
+- **choose_perks.html**: A perks selection page.
+- **choose_skills.html**: A skills selection page.
+- **choose_stats.html**: A stats selection page.
+- **dashboard.html**: A dashboard for managing characters.
+- **index.html**: Homepage for the Fallout 2D20 Character Creator
+- **login.html**: Login page.
+- **register.html**: Registration page.
 
 ### Misc files
-- **requirements.txt**:
-- **readme.md**:
-- **tree.txt**:
+- **requirements.txt**: Specifies the exact versions of Python packages needed for the project.
+- **readme.md**: Provides an overview of the project, including its purpose, features, and installation instructions
 
+<br><br>
 
 # Disclaimer
+Due to limited prior experience with JavaScript, a significant portion of the JavaScript used in this application was generated by AI and manually adjusted as needed.
+
+<br><br>
 
 # Conclusion
-
 The Character Management System is a robust, user-friendly application tailored to the needs of RPG and tabletop gaming enthusiasts. It provides a comprehensive platform for managing character profiles, offering detailed insights into each character's attributes and making it easy to maintain and organize multiple characters. The project is built with scalability and maintainability in mind, ensuring that it can grow and adapt to meet the evolving needs of its users. The careful consideration given to user experience, security, and modularity makes this system not only functional but also a joy to use, standing as a valuable tool for any gaming setup.
-
-
-# MISC
-Csrf
-Flask login managerDashboard
-What will your software do? What features will it have? How will it be executed?
-how to install and run yourself
