@@ -1,0 +1,35 @@
+Name;Description;Trait Data;Is Selectable
+Example Trait;This is an example trait.;{"example_key": "example_value"};False
+Strength Max;Strength can be raised to a max of 12.;{"stat": "Strength", "max": 12};False
+Endurance Max;Endurance can be raised to a max of 12.;{"stat": "Endurance", "max": 12};False
+Charisma Max;Charisma can be raised to a max of 6.;{"stat": "Charisma", "max": 6};False
+Intelligence Max;Intelligence can be raised to a max of 6.;{"stat": "Intelligence", "max": 6};False
+Educated;You have one additional tag skill.;{"extra_tag_skills": 1};True
+Fast Shot;If you take a second major action in combat, and use it to make a ranged attack, the additional major action only costs 1 AP, rather than 2.;{};True
+Gifted;Choose two S.P.E.C.I.A.L. attributes and increase them by +1 each.;{"extra_special_points": 2};True
+Heavy Handed;Your Melee Damage bonus increases by +1 CD.;{"extra_melee_damage": 1};True
+Small Frame;You may re-roll 1d20 on all AGI tests which rely on balance or contortion.;{};True
+Extra Perk;1 more perk;{"extra_perks": 1};True
+Reduced END Test Difficulty;Reduces the difficulty of all END tests to resist the effects of disease.;{};False
+Luck Point Recovery;Once per quest, the GM may introduce a complication related to your early life of isolation and confinement within the Vault. If the GM does this, you immediately regain one Luck Point.;{};False
+Additional Tag Skill;Your carefully-planned upbringing means you have one additional tag skill of your choice.;{"extra_tag_skills": 1};False
+Tag Energy Weapons;Free tag in Energy Weapons.;{"tag": "Energy Weapons"};True
+Tag Repair;Free tag in Repair.;{"tag": "Repair"};True
+Tag Science;Free tag in Science.;{"tag": "Science"};True
+Rad Healing;You regain 1 HP for every 3 points of radiation damage inflicted upon you.;{};False
+Rad Resting;When resting in an irradiated location, you may re-roll your dice pool when checking if your injuries heal.;{};False
+Tag Survival;Free tag in Survival.;{"tag": "Survival"};False
+Improved Sensors;You have 360° vision and improved sensory systems that can detect smells, chemicals, and radiation, reducing the difficulty of Perception tests that rely on sight and smell by 1.;{};False
+Immune to Radiation;You are immune to radiation.;{};False
+Immune to Poison;You are also immune to poison.;{};False
+Robo Body;You cannot use chems, nor can you benefit from food, drink, or rest.;{};False
+Robo Recovery;You cannot recover from your own injuries or heal health points without receiving repairs.;{};False
+Robo Carry;Your carry weight is 150 lbs., and it cannot be increased by your Strength or perks, but it can be increased by modified armor.;{"carry_weight": 150};False
+Hovering;You move by jet propulsion, hovering above the ground, unaffected by difficult terrain or obstacles.;{};False
+Robo Pistol;You can make ranged attacks using a 10mm auto pistol.;{};True
+Robo Saw;You can cut objects and make melee attacks with a circular saw. The buzz-saw inflicts 3 DC Piercing 1 physical damage.;{};True
+Robo Flamer;You can set objects alight, cook food, or make ranged attacks with a short-range flamethrower.;{};True
+Robo Laser;You can cut objects or make ranged attacks using a laser.;{};True
+Robo Pincer;You can pick up objects with an individual pincer that weighs no more than 40 lbs. and manipulate objects in your environment. You may also make unarmed attacks (2 DC physical damage) with the pincer.;{};True
+Super Mutant Ranks;You may not have more than 4 ranks in any skill.;{"Max Ranks": 4};False
+Super Mutant Armor;You can only wear armor which has been made to fit a super mutant.;{};False
