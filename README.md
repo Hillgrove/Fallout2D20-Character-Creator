@@ -38,6 +38,7 @@ The project is built using Python and Flask. It uses SQLAlchemy for ORM and SQLi
     - Jinja
     - Werkzeug
     - WTForms
+ - JavaScript
  - SQLite
  - HTML
  - CSS (Bootstrap)
@@ -212,4 +213,8 @@ Due to limited prior experience with JavaScript, a significant portion of the Ja
 <br><br>
 
 # Conclusion
-The Character Management System is a robust, user-friendly application tailored to the needs of RPG and tabletop gaming enthusiasts. It provides a comprehensive platform for managing character profiles, offering detailed insights into each character's attributes and making it easy to maintain and organize multiple characters. The project is built with scalability and maintainability in mind, ensuring that it can grow and adapt to meet the evolving needs of its users. The careful consideration given to user experience, security, and modularity makes this system not only functional but also a joy to use, standing as a valuable tool for any gaming setup.
+The Character Creation System is a streamlined, web-based tool designed to simplify and accelerate the process of creating new characters for Fallout 2D20 TTRPG. The application offers a modern, responsive interface that enhances usability across various devices, though optimal use is recommended on medium to large screen devices.
+
+One of the project's standout features is its web-based nature, which contrasts with the more common spreadsheet solutions, offering users a more interactive and accessible experience. Despite its simplicity, the project provided a valuable learning experience, allowing for the re-discovery of Python and the exploration of new tools like SQLAlchemy and Flask.
+
+The most rewarding aspect of the project was successfully integrating the backend with the frontend, despite the challenges involved. This project, as the final requirement for the CS50x course, represents a significant step in improving backend development skills while recognizing the importance of a polished user interface. Although the project highlighted the need for further focus on frontend skills, it has been a crucial learning experience, especially in understanding the value of unit testing and the role of client-side technologies like JavaScript.
