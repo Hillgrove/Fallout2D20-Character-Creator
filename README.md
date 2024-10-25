@@ -1,7 +1,5 @@
 # Fallout 2D20 Character Creator
 
-**Video URL**: [:https://www.youtube.com/watch?v=gcVHocFL4qA](https://www.youtube.com/watch?v=gcVHocFL4qA)
-
 ---
 
 ## Project Description
